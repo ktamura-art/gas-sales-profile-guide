@@ -1,4 +1,4 @@
-<title>営業支援コンソール 設計と実装</title>
+<title>企業プロファイル作成 要件定義</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -12,7 +12,6 @@
     --ok:#2C6E49; --ok-soft:#E4F0E9;
     --warn:#96660C; --warn-soft:#F8EFDC;
     --crit:#A33328; --crit-soft:#F8E6E3;
-    --code-bg:#1B2337; --code-fg:#E7ECF5;
     --f-sans:"BIZ UDPGothic","Hiragino Kaku Gothic ProN","メイリオ",Meiryo,system-ui,sans-serif;
     --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   }
@@ -25,7 +24,6 @@
       --ok:#63B187; --ok-soft:#12291D;
       --warn:#D3A44C; --warn-soft:#2F2610;
       --crit:#E0796C; --crit-soft:#331A17;
-      --code-bg:#0C111C; --code-fg:#DCE3EF;
     }
   }
   :root[data-theme="dark"]{
@@ -36,7 +34,6 @@
     --ok:#63B187; --ok-soft:#12291D;
     --warn:#D3A44C; --warn-soft:#2F2610;
     --crit:#E0796C; --crit-soft:#331A17;
-    --code-bg:#0C111C; --code-fg:#DCE3EF;
   }
 
   *{box-sizing:border-box}
@@ -46,98 +43,91 @@
 
   .eyebrow{font-family:var(--f-mono);font-size:11px;font-weight:600;
     letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
-  h1{font-size:clamp(25px,4.4vw,36px);font-weight:700;margin:8px 0 12px;line-height:1.35;text-wrap:balance}
+  h1{font-size:clamp(25px,4.4vw,36px);font-weight:700;margin:8px 0 12px;
+    line-height:1.35;text-wrap:balance}
   .sub{color:var(--ink-2);max-width:62ch;margin:0}
-  .meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);margin-top:14px;letter-spacing:.03em}
+  .meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);
+    margin-top:14px;letter-spacing:.03em}
+
+  .sec{margin-top:52px;scroll-margin-top:20px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;
+    border-bottom:2px solid var(--ink);padding-bottom:9px}
+  .sec-num{font-family:var(--f-mono);font-size:12px;font-weight:600;
+    color:var(--surface);background:var(--ink);padding:3px 9px;border-radius:2px;
+    letter-spacing:.06em;flex:none}
+  .sec-head h2{font-size:clamp(18px,2.6vw,21px);margin:0;font-weight:700;text-wrap:balance}
+  .lede{margin:16px 0 0;color:var(--ink-2);max-width:64ch}
+  h3{font-size:15px;font-weight:700;margin:28px 0 6px}
+  h3::before{content:"";display:inline-block;width:14px;height:2px;
+    background:var(--accent);vertical-align:middle;margin-right:9px}
+  p{margin:11px 0}
 
   nav.toc{margin-top:26px;border:1px solid var(--rule);background:var(--surface)}
-  nav.toc h2{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--muted);margin:0;padding:11px 18px;border-bottom:1px solid var(--rule);font-weight:600}
+  nav.toc h2{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);margin:0;padding:11px 18px;
+    border-bottom:1px solid var(--rule);font-weight:600}
   nav.toc ol{list-style:none;margin:0;padding:0}
   nav.toc li{border-bottom:1px solid var(--rule)}
   nav.toc li:last-child{border-bottom:none}
-  nav.toc a{display:grid;grid-template-columns:58px 1fr;gap:12px;align-items:baseline;
+  nav.toc a{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:baseline;
     padding:10px 18px;text-decoration:none;color:var(--ink)}
   nav.toc a:hover{background:var(--surface-2)}
   nav.toc a:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
   nav.toc .n{font-family:var(--f-mono);font-size:11.5px;color:var(--accent);font-weight:600}
   nav.toc .t{font-weight:700;font-size:14.5px}
 
-  .sec{margin-top:52px;scroll-margin-top:20px}
-  .sec-head{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
-  .sec-num{font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--surface);
-    background:var(--ink);padding:3px 9px;border-radius:2px;letter-spacing:.06em;flex:none}
-  .sec-head h2{font-size:clamp(18px,2.6vw,21px);margin:0;font-weight:700;text-wrap:balance}
-  .lede{margin:16px 0 0;color:var(--ink-2);max-width:64ch}
-  h3{font-size:15px;font-weight:700;margin:28px 0 6px}
-  h3::before{content:"";display:inline-block;width:14px;height:2px;background:var(--accent);
-    vertical-align:middle;margin-right:9px}
-  p{margin:11px 0}
-
   .scroller{overflow-x:auto;border:1px solid var(--rule);background:var(--surface);margin:12px 0}
   table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
-  th{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--muted);text-align:left;padding:9px 14px;border-bottom:1.5px solid var(--rule-strong);white-space:nowrap}
+  th{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);text-align:left;padding:9px 14px;
+    border-bottom:1.5px solid var(--rule-strong);white-space:nowrap}
   td{padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
   tbody tr:last-child td{border-bottom:none}
   td.k{font-weight:700;white-space:nowrap}
   td.m{font-family:var(--f-mono);font-size:12px;white-space:nowrap}
 
-  .pill{display:inline-block;font-family:var(--f-mono);font-size:10.5px;font-weight:600;
-    padding:2px 8px;border-radius:2px;white-space:nowrap}
+  .pill{display:inline-block;font-family:var(--f-mono);font-size:10.5px;
+    font-weight:600;padding:2px 8px;border-radius:2px;white-space:nowrap}
   .pill.req{background:var(--crit-soft);color:var(--crit)}
   .pill.rec{background:var(--accent-soft);color:var(--accent)}
   .pill.opt{background:var(--surface-2);color:var(--muted)}
   .pill.ok{background:var(--ok-soft);color:var(--ok)}
+  .pill.hold{background:var(--warn-soft);color:var(--warn)}
 
   .note{margin:14px 0;padding:12px 16px;font-size:13.5px;
     border-left:3px solid var(--accent);background:var(--accent-soft);color:var(--ink)}
   .note.warn{border-left-color:var(--warn);background:var(--warn-soft)}
   .note.crit{border-left-color:var(--crit);background:var(--crit-soft)}
-  .note.ok{border-left-color:var(--ok);background:var(--ok-soft)}
-  .note .lbl{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.12em;
-    text-transform:uppercase;color:var(--accent);display:block;margin-bottom:5px}
-  .note.warn .lbl{color:var(--warn)} .note.crit .lbl{color:var(--crit)} .note.ok .lbl{color:var(--ok)}
+  .note .lbl{font-family:var(--f-mono);font-size:10.5px;font-weight:600;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--accent);
+    display:block;margin-bottom:5px}
+  .note.warn .lbl{color:var(--warn)}
+  .note.crit .lbl{color:var(--crit)}
   .note p{margin:5px 0;font-size:13.5px;color:var(--ink-2)}
-  .note ol,.note ul{margin:6px 0;padding-left:20px;font-size:13.5px;color:var(--ink-2)}
+  .note ul{margin:6px 0;padding-left:20px;font-size:13.5px;color:var(--ink-2)}
 
-  pre.code{margin:10px 0;background:var(--code-bg);color:var(--code-fg);padding:13px 15px;
-    overflow-x:auto;font-family:var(--f-mono);font-size:12.5px;line-height:1.7;border-radius:3px}
+  pre.code{margin:10px 0;background:#131A2B;color:#E4EAF5;padding:13px 15px;
+    overflow-x:auto;font-family:var(--f-mono);font-size:12px;line-height:1.7;border-radius:3px}
   code.inl{font-family:var(--f-mono);font-size:12.5px;background:var(--surface-2);
     padding:1px 6px;border-radius:2px;border:1px solid var(--rule)}
 
-  .path{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0;font-size:13.5px}
-  .path b{background:var(--surface-2);border:1px solid var(--rule);padding:3px 9px;
-    border-radius:3px;font-weight:700;color:var(--ink)}
-  .path i{color:var(--muted);font-style:normal;font-family:var(--f-mono);font-size:12px}
-
-  details.src{margin:8px 0;border:1px solid var(--rule);background:var(--surface)}
-  details.src>summary{cursor:pointer;padding:10px 14px;list-style:none;
-    display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px}
-  details.src>summary::-webkit-details-marker{display:none}
-  details.src>summary::before{content:"▸";color:var(--accent);font-size:12px;flex:none}
-  details.src[open]>summary::before{content:"▾"}
-  details.src>summary:hover{background:var(--surface-2)}
-  details.src>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
-  details.src .fn{font-family:var(--f-mono);font-weight:600;font-size:13px}
-  details.src .sz{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);margin-left:auto}
-  .srcdesc{margin:0;padding:0 14px 8px;font-size:13px;color:var(--ink-2)}
-  .srcbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px;
-    background:var(--surface-2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
-  .srcfile{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-2)}
-  .srcbar button{margin-left:auto;border:1px solid var(--accent);background:none;color:var(--accent);
-    font-family:var(--f-mono);font-size:11.5px;padding:5px 14px;cursor:pointer;border-radius:2px}
-  .srcbar button:hover{background:var(--accent-soft)}
-  .srcbar button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .srcbar button.copied{font-weight:700}
-  pre.srcpre{margin:0;max-height:440px;overflow:auto;border-radius:0;font-size:11.5px;line-height:1.65}
-
-  figure.fig{margin:24px 0;padding:0}
+  figure.fig{margin:22px 0;padding:0}
   .figbox{overflow-x:auto;border:1px solid var(--rule);background:var(--surface)}
   figure.fig svg{display:block;width:100%;min-width:700px;height:auto;padding:16px 12px}
-  figure.fig figcaption{margin-top:11px;font-size:13.5px;color:var(--ink-2);line-height:1.8;
-    border-left:3px solid var(--accent);padding-left:13px}
+  figure.fig figcaption{margin-top:11px;font-size:13.5px;color:var(--ink-2);
+    line-height:1.8;border-left:3px solid var(--accent);padding-left:13px}
   figure.fig figcaption strong{color:var(--ink)}
+
+  .split{display:grid;gap:14px;margin:14px 0}
+  @media(min-width:720px){.split.two{grid-template-columns:1fr 1fr}}
+  .panel{border:1px solid var(--rule);background:var(--surface);padding:15px 18px}
+  .panel.pick{border-color:var(--accent);border-width:2px}
+  .panel .cap{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+  .panel.pick .cap{color:var(--accent)}
+  .panel h4{margin:0 0 6px;font-size:14.5px;font-weight:700}
+  .panel p{margin:6px 0 0;font-size:13.5px;color:var(--ink-2)}
+  .panel ul{margin:8px 0 0;padding-left:19px;font-size:13.5px;color:var(--ink-2)}
 
   footer.end{margin-top:58px;padding-top:18px;border-top:1px solid var(--rule-strong);
     font-family:var(--f-mono);font-size:11px;color:var(--muted);
@@ -148,1459 +138,510 @@
 <div class="wrap">
 
 <header>
-  <span class="eyebrow">営業支援コンソール ／ 設計と実装</span>
+  <span class="eyebrow">営業準備の自動化 ／ 要件定義</span>
   <h1>企業プロファイル作成</h1>
   <p class="sub">
-    企業データから商談前の資料3点を自動生成する仕組みの、設計・実装手順・コード一式です。
-    要件定義で決めた「CSVを入口にする」構成をそのまま形にしています。
+    企業データから、商談前の準備資料3点を自動生成する仕組みの要件定義です。
+    まず対話で使い始め、量産が必要になった段階で管理画面へ移す2段階の構成を推奨します。
   </p>
-  <p class="meta">株式会社デジライズ ／ v1.0 ／ 所要 約90分</p>
-  <p class="meta" style="color:var(--accent)">公開サンプル版：IDはすべてプレースホルダです ／
-  <a href="https://ktamura-art.github.io/sales-profile-console-demo/" style="color:var(--accent)">画面の操作デモはこちら</a></p>
+  <p class="meta">株式会社デジライズ ／ v1.0</p>
+  <p class="meta" style="color:var(--accent)">公開サンプル版 ／
+  <a href="./design.html" style="color:var(--accent)">設計と実装はこちら</a> ／
+  <a href="https://ktamura-art.github.io/sales-profile-console-demo/" style="color:var(--accent)">画面の操作デモ</a></p>
 </header>
 
 <nav class="toc" aria-label="目次">
   <h2>目次</h2>
   <ol>
-    <li><a href="#s1"><span class="n">01</span><span class="t">処理の全体像</span></a></li>
-    <li><a href="#s2"><span class="n">02</span><span class="t">ファイル構成と担当範囲</span></a></li>
-    <li><a href="#s3"><span class="n">03</span><span class="t">準備するもの</span></a></li>
-    <li><a href="#s4"><span class="n">04</span><span class="t">テンプレートの作り方</span></a></li>
-    <li><a href="#s5"><span class="n">05</span><span class="t">実装手順</span></a></li>
-    <li><a href="#s6"><span class="n">06</span><span class="t">コード一式</span></a></li>
-    <li><a href="#s7"><span class="n">07</span><span class="t">動作確認の順序</span></a></li>
-    <li><a href="#s8"><span class="n">08</span><span class="t">注意点と未実装</span></a></li>
+    <li><a href="#s1"><span class="n">01</span><span class="t">この版で変えたこと</span></a></li>
+    <li><a href="#s2"><span class="n">02</span><span class="t">アーキテクチャ ─ 2つの経路</span></a></li>
+    <li><a href="#s3"><span class="n">03</span><span class="t">管理画面のタブ構成</span></a></li>
+    <li><a href="#s4"><span class="n">04</span><span class="t">企業データの取り込み（CSV）</span></a></li>
+    <li><a href="#s5"><span class="n">05</span><span class="t">経路の比較とスキルの中身</span></a></li>
+    <li><a href="#s6"><span class="n">06</span><span class="t">機能要件（経路B）</span></a></li>
+    <li><a href="#s7"><span class="n">07</span><span class="t">費用試算</span></a></li>
+    <li><a href="#s8"><span class="n">08</span><span class="t">未確定の事項</span></a></li>
   </ol>
 </nav>
 
-<!-- ============ 01 ============ -->
+
+<!-- 01 -->
 <section class="sec" id="s1">
-  <div class="sec-head"><span class="sec-num">01</span><h2>処理の全体像</h2></div>
+  <div class="sec-head"><span class="sec-num">01</span><h2>この版で変えたこと</h2></div>
+  <p class="lede">
+    前版は<strong>企業データをAPIで取得する前提</strong>で書いていましたが、契約状況が未確定のため要件を固められない状態でした。
+    今回、<strong>入口をCSVアップロードに置き換え</strong>、それ以外を確定できる形にしています。
+  </p>
+
+  <div class="scroller">
+    <table>
+      <thead><tr><th></th><th>前版 v0.9</th><th>本版 v1.0</th></tr></thead>
+      <tbody>
+        <tr><td class="k">企業データの入口</td><td>帝国データバンク等のAPI</td><td><strong>CSVアップロード（仮）</strong></td></tr>
+        <tr><td class="k">要件の確定度</td><td>データ元が未確定で止まる</td><td><span class="pill ok">入口以外は確定できる</span></td></tr>
+        <tr><td class="k">API契約が決まったら</td><td>―</td><td><strong>取り込み部だけ差し替え</strong>。他は変更なし</td></tr>
+        <tr><td class="k">進め方</td><td>アプリを作ってから使う</td><td><strong>まず対話で使い始め、量産段階でアプリへ</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="lbl">CSVを仮置きにする利点</span>
+    <p>入口を差し替え可能な形で切り出しておけば、<strong>API契約を待たずに実装を始められます</strong>。
+    また、既にお持ちのデータをCSVで書き出せる場合は、<strong>そのまま本番運用に使えます</strong>（追加のデータ取得料が0円になります）。</p>
+  </div>
+</section>
+
+
+<!-- 02 -->
+<section class="sec" id="s2">
+  <div class="sec-head"><span class="sec-num">02</span><h2>アーキテクチャ ─ 2つの経路</h2></div>
+  <p class="lede">
+    同じ「企業データから3点を作る」でも、<strong>誰が動かすか</strong>で構成が変わります。
+    まず<strong>経路A（対話）で始め、量産が必要になったら経路B（アプリ）へ</strong>という順序を推奨します。
+  </p>
+
+  <h3>経路A：対話で作る　＜推奨・まずこちら＞</h3>
 
   <figure class="fig">
-    <div class="figbox"><svg viewBox="0 0 900 420" role="img" preserveAspectRatio="xMidYMid meet"
-      aria-label="全体構成。入口はCSVアップロードで、将来はAPIに差し替え可能。企業データ台帳スプレッドシートに入り、管理画面から生成を実行すると、テンプレートの差し込み箇所をClaudeが埋め、Googleドライブのクライアント別フォルダへ保存され、生成履歴に記録される。">
+    <div class="figbox"><svg viewBox="0 0 900 330" role="img" preserveAspectRatio="xMidYMid meet"
+      aria-label="経路Aの構成。Googleドライブに置いた企業データ台帳を、claude.aiがDriveコネクタ経由で読み取り、営業資料スキルが3点を生成してドライブへ保存する。人が対話で指示し、その場で修正できる。実装は不要。">
       <defs>
-        <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
-        <marker id="a1a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker>
+        <marker id="pa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+        <marker id="paa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker>
       </defs>
 
-      <rect x="16" y="44" width="206" height="150" rx="5" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="7 5"/>
-      <text x="26" y="36" font-size="11.5" font-weight="700" fill="var(--accent)">差し替え可能な部分</text>
-      <rect x="32" y="62" width="174" height="54" rx="3" fill="none" stroke="var(--accent)" stroke-width="1.8"/>
-      <text x="44" y="83" font-size="12.5" font-weight="700" fill="var(--accent)">CSVアップロード</text>
-      <text x="44" y="100" font-size="10.5" fill="var(--accent)" opacity=".9">今回はこちらで実装</text>
-      <rect x="32" y="126" width="174" height="52" rx="3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="4 4" opacity=".6"/>
-      <text x="44" y="147" font-size="12.5" font-weight="700" fill="currentColor" opacity=".7">企業データのAPI</text>
-      <text x="44" y="164" font-size="10.5" fill="currentColor" opacity=".55">契約が決まってから</text>
-      <line x1="224" y1="120" x2="260" y2="120" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#a1a)"/>
+      <rect x="20" y="70" width="196" height="86" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <text x="34" y="94" font-size="12.5" font-weight="700" fill="currentColor">Googleドライブ</text>
+      <text x="34" y="112" font-size="10.5" fill="currentColor" opacity=".7">企業データ台帳</text>
+      <text x="34" y="128" font-size="10.5" fill="currentColor" opacity=".7">（スプレッドシート）</text>
+      <text x="34" y="146" font-size="10.5" fill="currentColor" opacity=".7">CSVを置くだけ</text>
+      <line x1="218" y1="113" x2="256" y2="113" stroke="var(--accent)" stroke-width="1.8" marker-start="url(#paa)" marker-end="url(#paa)"/>
+      <text x="237" y="104" text-anchor="middle" font-size="10" fill="var(--accent)">読む</text>
 
-      <rect x="264" y="92" width="176" height="60" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
-      <text x="278" y="115" font-size="12.5" font-weight="700" fill="currentColor">企業データ台帳</text>
-      <text x="278" y="132" font-size="10.5" fill="currentColor" opacity=".7">スプレッドシート・1社1行</text>
-      <line x1="352" y1="152" x2="352" y2="188" stroke="currentColor" stroke-width="1.6" marker-end="url(#a1)"/>
+      <rect x="260" y="46" width="292" height="134" rx="4" fill="none" stroke="var(--accent)" stroke-width="2.2"/>
+      <text x="276" y="70" font-size="13" font-weight="700" fill="var(--accent)">claude.ai</text>
+      <rect x="276" y="82" width="260" height="40" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <text x="288" y="99" font-size="11.5" font-weight="700" fill="currentColor">Driveコネクタ</text>
+      <text x="288" y="114" font-size="10.5" fill="currentColor" opacity=".7">台帳を直接読める（毎回の添付が不要）</text>
+      <rect x="276" y="128" width="260" height="40" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <text x="288" y="145" font-size="11.5" font-weight="700" fill="currentColor">営業資料スキル</text>
+      <text x="288" y="160" font-size="10.5" fill="currentColor" opacity=".7">書き方・見積ロジック・見本を同梱</text>
+      <line x1="554" y1="113" x2="592" y2="113" stroke="currentColor" stroke-width="1.8" marker-end="url(#pa)"/>
 
-      <rect x="264" y="192" width="176" height="76" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/>
-      <text x="278" y="215" font-size="12.5" font-weight="700" fill="currentColor">管理画面</text>
-      <text x="278" y="232" font-size="10.5" fill="currentColor" opacity=".7">企業を選ぶ → 生成する</text>
-      <text x="278" y="248" font-size="10.5" fill="currentColor" opacity=".7">→ 確認する → 保存する</text>
-      <text x="278" y="263" font-size="10.5" fill="currentColor" opacity=".7">GAS Webアプリ・3タブ</text>
-      <line x1="442" y1="230" x2="480" y2="230" stroke="currentColor" stroke-width="1.6" marker-end="url(#a1)"/>
+      <rect x="596" y="62" width="284" height="102" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <text x="610" y="86" font-size="12.5" font-weight="700" fill="currentColor">3点の生成物</text>
+      <text x="610" y="105" font-size="10.5" fill="currentColor" opacity=".75">① 見積書</text>
+      <text x="610" y="122" font-size="10.5" fill="currentColor" opacity=".75">② 成果シミュレーション</text>
+      <text x="610" y="139" font-size="10.5" fill="currentColor" opacity=".75">③ 業務設計書</text>
+      <text x="610" y="157" font-size="10.5" fill="currentColor" opacity=".55">→ ドライブへ保存</text>
 
-      <rect x="484" y="192" width="186" height="76" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/>
-      <text x="498" y="215" font-size="12.5" font-weight="700" fill="currentColor">生成</text>
-      <text x="498" y="232" font-size="10.5" fill="currentColor" opacity=".7">Claude API</text>
-      <text x="498" y="248" font-size="10.5" fill="currentColor" opacity=".7">差し込み箇所の値だけを</text>
-      <text x="498" y="263" font-size="10.5" fill="currentColor" opacity=".7">作らせる</text>
+      <rect x="260" y="212" width="292" height="52" rx="3" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="6 4"/>
+      <text x="276" y="234" font-size="12" font-weight="700" fill="var(--accent)">人が対話で指示する</text>
+      <text x="276" y="252" font-size="10.5" fill="var(--accent)" opacity=".9">「A社の営業資料3点を作って」</text>
+      <line x1="406" y1="212" x2="406" y2="184" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#paa)"/>
 
-      <rect x="484" y="92" width="186" height="60" rx="3" fill="none" stroke="var(--accent)" stroke-width="1.8"/>
-      <text x="498" y="115" font-size="12.5" font-weight="700" fill="var(--accent)">テンプレート 3点</text>
-      <text x="498" y="132" font-size="10.5" fill="var(--accent)" opacity=".9">Googleドキュメント・体裁を固定</text>
-      <line x1="577" y1="152" x2="577" y2="188" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#a1a)"/>
-      <line x1="672" y1="230" x2="710" y2="230" stroke="currentColor" stroke-width="1.6" marker-end="url(#a1)"/>
-
-      <rect x="714" y="164" width="170" height="60" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <text x="726" y="186" font-size="12" font-weight="700" fill="currentColor">生成物 3点</text>
-      <text x="726" y="203" font-size="10.5" fill="currentColor" opacity=".7">見積書／効果試算／業務設計</text>
-      <line x1="799" y1="224" x2="799" y2="252" stroke="currentColor" stroke-width="1.6" marker-end="url(#a1)"/>
-      <rect x="714" y="256" width="170" height="54" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <text x="726" y="277" font-size="12" font-weight="700" fill="currentColor">Googleドライブ</text>
-      <text x="726" y="294" font-size="10.5" fill="currentColor" opacity=".7">クライアント別フォルダ</text>
-
-      <line x1="352" y1="268" x2="352" y2="320" stroke="currentColor" stroke-width="1.4" marker-end="url(#a1)"/>
-      <rect x="264" y="324" width="176" height="46" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/>
-      <text x="278" y="344" font-size="12" font-weight="700" fill="currentColor">生成履歴</text>
-      <text x="278" y="360" font-size="10.5" fill="currentColor" opacity=".7">いつ・誰が・どの企業で</text>
-
-      <text x="450" y="404" text-anchor="middle" font-size="11" fill="currentColor" opacity=".65">サーバー不要。Googleアカウントと Claude API だけで動きます。</text>
+      <text x="450" y="298" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--accent)">実装ゼロ。3フォーマットの実物と台帳があれば、その日から使えます。</text>
+      <text x="450" y="316" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".65">出来上がりが気に入らなければ、その場で言えば直ります。</text>
     </svg></div>
     <figcaption>
-      <strong>図1：全体の構成。</strong>
-      オレンジは2か所です。左は<strong>差し替える前提の入口</strong>、右は<strong>体裁を決めるテンプレート</strong>。
-      この2つ以外は、契約状況やフォーマットが変わっても手を入れずに済みます。
+      <strong>図1：経路A。作るものはスキル1つだけで、システムは作りません。</strong>
+      企業データは<strong>ドライブに置いたまま</strong>Claudeが読みます。CSVを毎回アップロードする必要はありません。
+      <strong>その場で直せる</strong>ため、3つの経路のなかで精度がいちばん高くなります。
     </figcaption>
   </figure>
+
+  <h3>経路B：アプリで量産　＜フェーズ2＞</h3>
+  <p style="font-size:14.5px;color:var(--ink-2)">
+    月100件を自動で回す段階になったら、管理画面から一括で生成する構成に移ります。
+    <strong>経路Aで磨いたスキルの中身が、そのままこちらの土台</strong>になります。
+  </p>
 
   <figure class="fig">
-    <div class="figbox"><svg viewBox="0 0 900 300" role="img" preserveAspectRatio="xMidYMid meet"
-      aria-label="生成のしくみ。テンプレートの中の二重波かっこで囲まれた差し込み箇所をコードが読み取り、そのキーの一覧をClaudeに渡して値だけを作らせ、テンプレートを複製して置き換える。レイアウトはテンプレートが決めるため崩れない。">
-      <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <div class="figbox"><svg viewBox="0 0 900 470" role="img" preserveAspectRatio="xMidYMid meet"
+      aria-label="企業プロファイル作成の構成図。左端の取り込み部は差し替え可能なゾーンで、当面はCSVアップロード、将来は帝国データバンク等のAPIに置き換える。取り込まれたデータは企業データ台帳スプレッドシートに入り、管理画面から生成を実行するとClaude APIが3フォーマットを生成し、Googleドライブのクライアント別フォルダへ保存され、生成履歴が記録される。">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+        <marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+        </marker>
+      </defs>
 
-      <rect x="20" y="40" width="200" height="120" rx="3" fill="none" stroke="var(--accent)" stroke-width="2"/>
-      <text x="34" y="62" font-size="12.5" font-weight="700" fill="var(--accent)">① テンプレート</text>
-      <text x="34" y="84" font-size="11" fill="currentColor" opacity=".8">御見積書</text>
-      <text x="34" y="103" font-size="11" font-family="var(--f-mono)" fill="var(--accent)">{{企業名}} 御中</text>
-      <text x="34" y="121" font-size="11" font-family="var(--f-mono)" fill="var(--accent)">合計 {{合計金額}}</text>
-      <text x="34" y="143" font-size="10.5" fill="currentColor" opacity=".6">体裁はここで固定される</text>
-      <line x1="222" y1="100" x2="258" y2="100" stroke="currentColor" stroke-width="1.6" marker-end="url(#a2)"/>
+      <!-- 差し替えゾーン -->
+      <rect x="16" y="44" width="212" height="184" rx="5" fill="none"
+            stroke="var(--accent)" stroke-width="2" stroke-dasharray="7 5"/>
+      <text x="26" y="36" font-size="11.5" font-weight="700" fill="var(--accent)">差し替え可能な部分</text>
 
-      <rect x="262" y="52" width="180" height="96" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <text x="276" y="74" font-size="12.5" font-weight="700" fill="currentColor">② 差し込み箇所を読む</text>
-      <text x="276" y="94" font-size="10.5" fill="currentColor" opacity=".7">コードが {{ }} を全部拾い、</text>
-      <text x="276" y="110" font-size="10.5" fill="currentColor" opacity=".7">キーの一覧を作る</text>
-      <text x="276" y="132" font-size="10.5" font-family="var(--f-mono)" fill="currentColor" opacity=".8">["企業名","合計金額",…]</text>
-      <line x1="444" y1="100" x2="480" y2="100" stroke="currentColor" stroke-width="1.6" marker-end="url(#a2)"/>
+      <rect x="32" y="62" width="180" height="60" rx="3" fill="none" stroke="var(--accent)" stroke-width="1.8"/>
+      <text x="44" y="84" font-size="12.5" font-weight="700" fill="var(--accent)">CSVアップロード</text>
+      <text x="44" y="101" font-size="10.5" fill="var(--accent)" opacity=".9">当面はこちら（本要件の前提）</text>
+      <text x="44" y="115" font-size="10.5" fill="var(--accent)" opacity=".9">手元のデータをそのまま使える</text>
 
-      <rect x="484" y="52" width="180" height="96" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
-      <text x="498" y="74" font-size="12.5" font-weight="700" fill="currentColor">③ 値だけを作らせる</text>
-      <text x="498" y="94" font-size="10.5" fill="currentColor" opacity=".7">企業データ＋キー一覧を</text>
-      <text x="498" y="110" font-size="10.5" fill="currentColor" opacity=".7">Claudeに渡す</text>
-      <text x="498" y="132" font-size="10.5" fill="currentColor" opacity=".7">戻りはJSONだけ</text>
-      <line x1="666" y1="100" x2="702" y2="100" stroke="currentColor" stroke-width="1.6" marker-end="url(#a2)"/>
+      <text x="122" y="140" text-anchor="middle" font-size="11" fill="var(--accent)" opacity=".8">将来ここを入れ替える</text>
 
-      <rect x="706" y="52" width="176" height="96" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <text x="720" y="74" font-size="12.5" font-weight="700" fill="currentColor">④ 複製して置換</text>
-      <text x="720" y="94" font-size="10.5" fill="currentColor" opacity=".7">テンプレートを複製し、</text>
-      <text x="720" y="110" font-size="10.5" fill="currentColor" opacity=".7">{{ }} を値に差し替える</text>
-      <text x="720" y="132" font-size="10.5" fill="currentColor" opacity=".7">元は書き換えない</text>
+      <rect x="32" y="150" width="180" height="60" rx="3" fill="none" stroke="currentColor"
+            stroke-width="1.4" stroke-dasharray="4 4" opacity=".65"/>
+      <text x="44" y="172" font-size="12.5" font-weight="700" fill="currentColor" opacity=".7">企業データのAPI</text>
+      <text x="44" y="189" font-size="10.5" fill="currentColor" opacity=".55">帝国データバンク 等</text>
+      <text x="44" y="203" font-size="10.5" fill="currentColor" opacity=".55">契約が決まってから</text>
 
-      <rect x="262" y="192" width="620" height="62" rx="3" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="6 4"/>
-      <text x="278" y="215" font-size="12" font-weight="700" fill="var(--accent)">AIが担当するのは③だけです</text>
-      <text x="278" y="234" font-size="11" fill="var(--ink-2)">レイアウト・項目の並び・書式はテンプレートが決めるため、生成のたびに体裁が変わることがありません。</text>
-      <text x="278" y="249" font-size="11" fill="var(--ink-2)">テンプレートに項目を足せば、コードを変えずに生成内容が増えます。</text>
-      <line x1="574" y1="148" x2="574" y2="188" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#a2)"/>
+      <line x1="230" y1="136" x2="266" y2="136" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#ara)"/>
+
+      <!-- 台帳 -->
+      <rect x="270" y="100" width="180" height="72" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <text x="284" y="124" font-size="12.5" font-weight="700" fill="currentColor">企業データ台帳</text>
+      <text x="284" y="141" font-size="10.5" fill="currentColor" opacity=".7">スプレッドシート</text>
+      <text x="284" y="156" font-size="10.5" fill="currentColor" opacity=".7">1社1行・取り込み済みは再利用</text>
+
+      <line x1="360" y1="172" x2="360" y2="208" stroke="currentColor" stroke-width="1.6" marker-end="url(#ar)"/>
+
+      <!-- 管理画面 -->
+      <rect x="270" y="212" width="180" height="86" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/>
+      <text x="284" y="236" font-size="12.5" font-weight="700" fill="currentColor">管理画面</text>
+      <text x="284" y="253" font-size="10.5" fill="currentColor" opacity=".7">企業を選ぶ → 生成する</text>
+      <text x="284" y="268" font-size="10.5" fill="currentColor" opacity=".7">不足項目は画面で補える</text>
+      <text x="284" y="286" font-size="10.5" fill="currentColor" opacity=".7">GAS Webアプリ</text>
+
+      <line x1="452" y1="255" x2="490" y2="255" stroke="currentColor" stroke-width="1.6" marker-end="url(#ar)"/>
+
+      <!-- 生成エンジン -->
+      <rect x="494" y="212" width="190" height="86" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/>
+      <text x="508" y="236" font-size="12.5" font-weight="700" fill="currentColor">生成エンジン</text>
+      <text x="508" y="253" font-size="10.5" fill="currentColor" opacity=".7">Claude API</text>
+      <text x="508" y="268" font-size="10.5" fill="currentColor" opacity=".7">見本フォーマット＋企業データ</text>
+      <text x="508" y="286" font-size="10.5" fill="currentColor" opacity=".7">を渡して3点を生成</text>
+
+      <!-- 見本 -->
+      <rect x="494" y="104" width="190" height="64" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <text x="508" y="126" font-size="12" font-weight="700" fill="currentColor">見本フォーマット</text>
+      <text x="508" y="143" font-size="10.5" fill="currentColor" opacity=".7">既存の3点をそのまま「型」に</text>
+      <text x="508" y="158" font-size="10.5" fill="currentColor" opacity=".7">1回登録すれば以降は不要</text>
+      <line x1="589" y1="168" x2="589" y2="208" stroke="currentColor" stroke-width="1.6" marker-end="url(#ar)"/>
+
+      <line x1="686" y1="255" x2="724" y2="255" stroke="currentColor" stroke-width="1.6" marker-end="url(#ar)"/>
+
+      <!-- 出力 -->
+      <rect x="728" y="150" width="156" height="52" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <text x="740" y="170" font-size="12" font-weight="700" fill="currentColor">① 見積書</text>
+      <text x="740" y="187" font-size="10.5" fill="currentColor" opacity=".7">企業規模から自動算出</text>
+
+      <rect x="728" y="210" width="156" height="52" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <text x="740" y="230" font-size="12" font-weight="700" fill="currentColor">② 成果シミュレーション</text>
+      <text x="740" y="247" font-size="10.5" fill="currentColor" opacity=".7">売上・人数から効果試算</text>
+
+      <rect x="728" y="270" width="156" height="52" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <text x="740" y="290" font-size="12" font-weight="700" fill="currentColor">③ 業務設計書</text>
+      <text x="740" y="307" font-size="10.5" fill="currentColor" opacity=".7">業種から想定フロー</text>
+
+      <line x1="806" y1="322" x2="806" y2="356" stroke="currentColor" stroke-width="1.6" marker-end="url(#ar)"/>
+      <rect x="700" y="360" width="184" height="52" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <text x="712" y="380" font-size="12" font-weight="700" fill="currentColor">Googleドライブ</text>
+      <text x="712" y="397" font-size="10.5" fill="currentColor" opacity=".7">クライアント別フォルダへ保存</text>
+
+      <!-- 履歴 -->
+      <line x1="360" y1="298" x2="360" y2="360" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+      <rect x="270" y="364" width="180" height="48" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <text x="284" y="384" font-size="12" font-weight="700" fill="currentColor">生成履歴</text>
+      <text x="284" y="400" font-size="10.5" fill="currentColor" opacity=".7">いつ・誰が・どの企業で</text>
+
+      <text x="450" y="446" text-anchor="middle" font-size="11" fill="currentColor" opacity=".65">サーバー不要。Googleアカウントと Claude API だけで完結します。</text>
     </svg></div>
     <figcaption>
-      <strong>図2：テンプレートが差し込み箇所を決め、AIはそこだけを埋めます。</strong>
-      この向きにしたのが設計上の要点です。AIに文書全体を書かせると体裁が毎回ぶれますが、
-      この形なら<strong>ぶれるのは中身だけ</strong>になります。
-      <strong>テンプレートを直せば出力が変わる</strong>ので、体裁の調整にコード変更が要りません。
+      <strong>図2：経路B。入口だけがオレンジの点線で囲ってある部分です。</strong>
+      ここをCSVからAPIに入れ替えても、<strong>台帳から右側はいっさい変わりません</strong>。
+      だからこそ、契約が決まる前に実装を始められます。
+      なお<strong>APIのサンドボックスはネットワーク接続を持たない</strong>ため、経路Bでは
+      Claudeがドライブを直接読むことはできません。アプリが台帳を読んで渡す形になります。
     </figcaption>
   </figure>
 </section>
 
-<!-- ============ 02 ============ -->
-<section class="sec" id="s2">
-  <div class="sec-head"><span class="sec-num">02</span><h2>ファイル構成と担当範囲</h2></div>
-  <div class="scroller">
-    <table>
-      <thead><tr><th>ファイル</th><th>担当する範囲</th><th>図での位置</th></tr></thead>
-      <tbody>
-        <tr><td class="m">設定</td><td>ID・モデルの設定。ここだけ環境ごとに書き換える</td><td>―</td></tr>
-        <tr><td class="m">企業データ</td><td>CSVの取り込み、台帳の読み書き、必須項目の欠け判定</td><td><strong>図1の左半分</strong></td></tr>
-        <tr><td class="m">生成</td><td>差し込み箇所の読み取り、Claudeへの指示、応答の解釈</td><td><strong>図2の②③</strong></td></tr>
-        <tr><td class="m">出力</td><td>テンプレートの複製・置換、フォルダ作成、履歴記録</td><td><strong>図2の④</strong></td></tr>
-        <tr><td class="m">メイン</td><td>Webアプリの入口と、画面から呼ばれるAPI</td><td>図1の管理画面（裏側）</td></tr>
-        <tr><td class="m">画面</td><td>3タブの画面。HTMLファイルとして追加する</td><td>図1の管理画面（表側）</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="note ok">
-    <span class="lbl">API化するとき、直すのは1ファイルだけです</span>
-    <p><strong>「企業データ」ファイルだけ</strong>を差し替えれば済みます。台帳に入ったあとの処理は、
-    データがCSVから来たかAPIから来たかを知りません。他の5ファイルは変更不要です。</p>
-  </div>
-</section>
 
-<!-- ============ 03 ============ -->
+<!-- 03 -->
 <section class="sec" id="s3">
-  <div class="sec-head"><span class="sec-num">03</span><h2>準備するもの</h2></div>
-  <div class="scroller">
-    <table>
-      <thead><tr><th>#</th><th>用意するもの</th><th>用途</th></tr></thead>
-      <tbody>
-        <tr><td class="m">1</td><td class="k">スプレッドシート 1つ</td><td>企業データ台帳と生成履歴。シートは空でよく、自動で作られます</td></tr>
-        <tr><td class="m">2</td><td class="k">Googleドライブのフォルダ 1つ</td><td>生成物の保存先。この下にクライアント別フォルダが自動でできます</td></tr>
-        <tr><td class="m">3</td><td class="k">Googleドキュメント 3つ</td><td>3フォーマットのテンプレート（第4章の作り方を参照）</td></tr>
-        <tr><td class="m">4</td><td class="k">Claude APIキー</td><td>生成に使用。スクリプトプロパティに保存します</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="note crit">
-    <span class="lbl">APIキーはコードに書かないでください</span>
-    <p>スクリプトプロパティに <code class="inl">CLAUDE_API_KEY</code> という名前で保存します。
-    コードに直接書くと、コードを共有したときにそのまま漏れます。
-    <strong>スプレッドシートに書くのも避けてください</strong>（閲覧権限のある方全員に見えます）。</p>
-  </div>
-</section>
-
-<!-- ============ 04 ============ -->
-<section class="sec" id="s4">
-  <div class="sec-head"><span class="sec-num">04</span><h2>テンプレートの作り方</h2></div>
+  <div class="sec-head"><span class="sec-num">03</span><h2>管理画面のタブ構成</h2></div>
   <p class="lede">
-    ここが実装の中で<strong>いちばん重要で、いちばん簡単</strong>な部分です。
-    既存の見本をGoogleドキュメントにして、企業ごとに変わる箇所を <code class="inl">{{ }}</code> で囲むだけです。
+    <strong>ここから第6章までは、経路B（アプリで量産）の話です。</strong>
+    管理画面は1つのWebアプリとし、機能ごとにタブを分けます。本要件で定義するのは①のみで、
+    ②③は①を動かすために最小限必要なものです。
   </p>
 
-  <h3>手順</h3>
-  <ol style="font-size:14.5px;color:var(--ink-2)">
-    <li>既存の見積書・成果シミュレーション・業務設計書を、<strong>Googleドキュメントとして保存</strong>します</li>
-    <li>企業ごとに変わる箇所を <code class="inl">{{企業名}}</code> のように置き換えます</li>
-    <li>3つのドキュメントIDを、設定ファイルの <code class="inl">TEMPLATES</code> に貼ります</li>
-  </ol>
-
-  <h3>置き換えの例</h3>
-  <pre class="code">【変更前】
-株式会社サンプル製作所 御中
-合計金額：2,800,000円（税別）
-削減見込：月48時間
-
-【変更後】
-{{企業名}} 御中
-合計金額：{{合計金額}}
-削減見込：{{削減時間}}</pre>
+  <div class="scroller">
+    <table>
+      <thead><tr><th>タブ</th><th>役割</th><th>本要件での扱い</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="k">① 企業プロファイル作成</td>
+          <td>企業を選び、3フォーマットを生成する。生成物のプレビューと保存</td>
+          <td><span class="pill req">本要件で定義</span></td>
+        </tr>
+        <tr>
+          <td class="k">② 企業データ</td>
+          <td>CSVの取り込み、取り込み済み企業の一覧・検索、項目の手動補正</td>
+          <td><span class="pill rec">最小限を定義</span></td>
+        </tr>
+        <tr>
+          <td class="k">③ 生成履歴</td>
+          <td>いつ・誰が・どの企業で何を生成したかの一覧。生成物へのリンク</td>
+          <td><span class="pill rec">最小限を定義</span></td>
+        </tr>
+        <tr>
+          <td class="k">（将来）他業務</td>
+          <td>経費申請の状況確認、工数ダッシュボードなど</td>
+          <td><span class="pill opt">対象外</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <div class="note">
-    <span class="lbl">キーの名前は自由です</span>
-    <p>日本語でも英語でも構いません。コードは <code class="inl">{{ }}</code> の中を読んで、
-    <strong>そのままAIへ渡すキーとして使います</strong>。
-    「{{今期の課題仮説}}」のように長い名前にすると、AIが何を書くべきか分かりやすくなり、精度が上がります。</p>
-  </div>
-  <div class="note warn">
-    <span class="lbl">表・見出し・書式はそのままで構いません</span>
-    <p>置換は<strong>文字だけ</strong>を対象にします。表組み・フォント・ロゴ・改ページは一切触りません。
-    そのため、見本の体裁がそのまま生成物の体裁になります。</p>
+    <span class="lbl">タブに分ける理由</span>
+    <p>今後ほかの業務も同じ画面に足していける形にしておくためです。
+    1機能1画面で作ると、増えたときに入口が散らばります。</p>
   </div>
 </section>
 
-<!-- ============ 05 ============ -->
+
+<!-- 04 -->
+<section class="sec" id="s4">
+  <div class="sec-head"><span class="sec-num">04</span><h2>企業データの取り込み（CSV）</h2></div>
+
+  <h3>取り込みの流れ</h3>
+  <p>管理画面の「② 企業データ」タブからCSVをアップロードすると、企業データ台帳（スプレッドシート）へ取り込まれます。</p>
+  <ul style="font-size:14px;color:var(--ink-2)">
+    <li><strong>キーは企業名</strong>（法人番号があればそちらを優先）。既にある企業は<strong>上書き更新</strong>します</li>
+    <li>取り込み時に<strong>必須項目の欠けをチェック</strong>し、不足があれば画面に一覧で出します</li>
+    <li>不足項目は<strong>画面から手入力で補えます</strong>（CSVを作り直す必要はありません）</li>
+  </ul>
+
+  <h3>CSVの項目（案）</h3>
+  <p>3フォーマットの生成に必要な項目から逆算しています。<strong>必須は5項目だけ</strong>です。</p>
+  <div class="scroller">
+    <table>
+      <thead><tr><th>列名</th><th>用途</th><th>要否</th></tr></thead>
+      <tbody>
+        <tr><td class="m">company_name</td><td>企業名。全フォーマットの基本情報・突合キー</td><td><span class="pill req">必須</span></td></tr>
+        <tr><td class="m">industry</td><td>業種。業務設計書の想定フローを決める</td><td><span class="pill req">必須</span></td></tr>
+        <tr><td class="m">employees</td><td>従業員数。見積書の規模判定・効果試算</td><td><span class="pill req">必須</span></td></tr>
+        <tr><td class="m">revenue</td><td>売上高。成果シミュレーションの試算根拠</td><td><span class="pill req">必須</span></td></tr>
+        <tr><td class="m">business_desc</td><td>事業内容。課題仮説と業務設計書</td><td><span class="pill req">必須</span></td></tr>
+        <tr><td class="m">address</td><td>所在地</td><td><span class="pill opt">任意</span></td></tr>
+        <tr><td class="m">representative</td><td>代表者名</td><td><span class="pill opt">任意</span></td></tr>
+        <tr><td class="m">established</td><td>設立年。提案タイミングの判断</td><td><span class="pill opt">任意</span></td></tr>
+        <tr><td class="m">fiscal_month</td><td>決算月。同上</td><td><span class="pill opt">任意</span></td></tr>
+        <tr><td class="m">profit</td><td>利益。効果試算の精度向上</td><td><span class="pill opt">任意</span></td></tr>
+        <tr><td class="m">corporate_number</td><td>法人番号。あれば突合キーに使用</td><td><span class="pill opt">任意</span></td></tr>
+        <tr><td class="m">note</td><td>自由記述。商談メモなど生成に効かせたい情報</td><td><span class="pill opt">任意</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <pre class="code">company_name,industry,employees,revenue,business_desc,address,note
+株式会社サンプル製作所,金属製品製造,120,2400000000,精密部品の受託加工,愛知県名古屋市,3期連続増収</pre>
+
+  <div class="note warn">
+    <span class="lbl">この項目定義は仮です</span>
+    <p>お手元のデータで<strong>実際に書き出せる列</strong>に合わせて確定します。
+    サンプルCSVを1本いただければ、それに合わせた定義に差し替えます。列名も現行のままで構いません。</p>
+  </div>
+</section>
+
+
+<!-- 05 -->
 <section class="sec" id="s5">
-  <div class="sec-head"><span class="sec-num">05</span><h2>実装手順</h2></div>
-
-  <p><strong>STEP 1</strong>　Apps Scriptで新しいプロジェクトを作り、名前を「営業支援コンソール」にします。</p>
-  <div class="note">
-    <span class="lbl">経費自動化とは別プロジェクトを推奨します</span>
-    <p>設定値の名前は <code class="inl">営業支援設定</code>／<code class="inl">経費設定</code> と分けてあり、共通の関数名も重ならないようにしてあります。<strong>同名の衝突は解消済み</strong>ですが、権限とトリガーの管理を分けるため、プロジェクトは分けることをおすすめします。</p>
-  </div>
-
-  <p><strong>STEP 2</strong>　第6章の5つの <code class="inl">.gs</code> を、同じ名前でファイル追加して貼り付けます。</p>
-  <p><strong>STEP 3</strong>　<strong>画面</strong>だけはHTMLファイルとして追加します。</p>
-  <div class="path"><b>ファイルの ＋</b><i>→</i><b>HTML</b><i>→</i><b>名前は「画面」</b></div>
-  <p style="font-size:13.5px;color:var(--ink-2)">
-    <code class="inl">.html</code> は自動で付きます。名前を変える場合は、メインの
-    <code class="inl">createHtmlOutputFromFile('画面')</code> も合わせて直してください。
+  <div class="sec-head"><span class="sec-num">05</span><h2>経路の比較とスキルの中身</h2></div>
+  <p class="lede">
+    2つの経路は、対立する選択肢ではなく<strong>順番</strong>です。
+    経路Aで実運用しながらスキルを磨き、量産が必要になった段階で経路Bへ移ります。
   </p>
 
-  <p><strong>STEP 4</strong>　「設定」の 営業支援設定 を、第3章で用意したIDに書き換えます。</p>
-  <p><strong>STEP 5</strong>　スクリプトプロパティに <code class="inl">CLAUDE_API_KEY</code> を登録します。</p>
-  <div class="path"><b>歯車</b><i>→</i><b>プロジェクトの設定</b><i>→</i><b>スクリプト プロパティ</b></div>
-
-  <p><strong>STEP 6</strong>　第7章の順に動作確認します。</p>
-
-  <p><strong>STEP 7</strong>　問題なければ、Webアプリとしてデプロイします。</p>
-  <div class="path"><b>デプロイ</b><i>→</i><b>新しいデプロイ</b><i>→</i><b>種類：ウェブアプリ</b></div>
   <div class="scroller">
     <table>
-      <thead><tr><th>設定項目</th><th>選ぶもの</th><th>理由</th></tr></thead>
+      <thead><tr><th></th><th>経路A：対話で作る</th><th>経路B：アプリで量産</th></tr></thead>
       <tbody>
-        <tr><td class="k">次のユーザーとして実行</td><td>自分</td><td>台帳とドライブへのアクセスを1つに集約するため</td></tr>
-        <tr><td class="k">アクセスできるユーザー</td><td><strong>組織内の全員</strong></td><td>営業メンバーが使う場合。代表のみなら「自分のみ」</td></tr>
+        <tr><td class="k">動かす場所</td><td>claude.ai</td><td>管理画面（GAS Webアプリ）</td></tr>
+        <tr><td class="k">誰が動かすか</td><td>人が対話で指示</td><td>ボタン1つ・自動</td></tr>
+        <tr><td class="k">企業データの読み方</td><td><strong>Driveコネクタで直接読む</strong></td><td>アプリが台帳を読んで渡す</td></tr>
+        <tr><td class="k">実装</td><td><span class="pill ok">不要</span></td><td>6ファイル（実装済み）</td></tr>
+        <tr><td class="k">体裁の再現</td><td>スキルに見本を同梱</td><td>テンプレートに差し込み</td></tr>
+        <tr><td class="k">生成後の修正</td><td><strong>その場で対話して直せる</strong></td><td>画面で値を直して保存</td></tr>
+        <tr><td class="k">向く件数</td><td>1件ずつ・都度</td><td>月100件の量産</td></tr>
+        <tr><td class="k">追加費用</td><td><span class="pill ok">プラン内（従量課金なし）</span></td><td>約2,600円／月</td></tr>
+        <tr><td class="k">着手できる時期</td><td><strong>3フォーマットが揃えばすぐ</strong></td><td>テンプレート整備のあと</td></tr>
       </tbody>
     </table>
   </div>
-  <div class="note warn">
-    <span class="lbl">「全員（匿名ユーザーを含む）」は選ばないでください</span>
-    <p>URLを知っていれば社外の誰でも開けてしまい、<strong>企業データが外部から見える状態</strong>になります。</p>
+
+  <h3>経路Aを先に置く理由</h3>
+  <p>
+    <strong>スキルの中身は、実際に使ってみないと固まらないからです。</strong>
+    「この言い回しは硬い」「この数値の出し方は違う」は、作っている段階では出てきません。
+    経路Aなら対話しながら直せるので、その気づきをそのままスキルに反映していけます。
+  </p>
+  <p>
+    そして<strong>磨いたスキルの中身は、経路Bのプロンプトの土台としてそのまま使えます</strong>。
+    先に経路Bを作ると、精度が固まらないまま実装が終わってしまいます。
+  </p>
+
+  <h3>スキルの構成（たたき台）</h3>
+  <p>作るのは1つのフォルダだけです。zipにしてclaude.aiへアップロードします。</p>
+  <pre class="code">sales-proposal-set/
+  SKILL.md              ← 何をするか・いつ使うか
+  見積ロジック.md         ← 規模区分と料金の決め方
+  効果試算の前提.md       ← 単価・削減率の根拠
+  書き方のルール.md       ← 言い回し・粒度・禁止事項
+  examples/
+    見積書_サンプル.md            ← ★過去の実物。いちばん効く
+    成果シミュレーション_サンプル.md
+    業務設計書_サンプル.md</pre>
+
+  <p><code class="inl">SKILL.md</code> の冒頭はこの形です。</p>
+  <pre class="code">---
+name: sales-proposal-set
+description: 企業プロファイルから、見積書・成果シミュレーション・業務設計書の3点を作成する。
+  企業名や企業データを渡されて営業資料・提案資料・見積を求められたときに使う。
+---</pre>
+
+  <div class="note">
+    <span class="lbl">description が起動条件になります</span>
+    <p>Claudeはこの説明文と依頼内容を照らして、スキルを使うかどうかを判断します。
+    そのため<strong>「何をするか」と「いつ使うか」の両方</strong>を書くのが要点です。</p>
+    <p>参照ファイルは<strong>読まれるまでトークンを消費しません</strong>。
+    過去の実物を何件入れても、普段のコストは増えません。</p>
   </div>
-</section>
 
-<!-- ============ 06 ============ -->
-<section class="sec" id="s6">
-  <div class="sec-head"><span class="sec-num">06</span><h2>コード一式</h2></div>
-  <p class="lede">6ファイルです。行をクリックすると全文が開き、そのままコピーできます。</p>
-      <details class="src">
-        <summary><span class="fn">設定.gs</span><span class="pill req">必須</span><span class="sz">63行 / 約3KB</span></summary>
-        <p class="srcdesc">フォルダID・シートID・テンプレートID・モデルの設定</p>
-        <div class="srcbar"><span class="srcfile">Apps Scriptでのファイル名：<b>設定</b></span><button type="button" data-copy-src="s-cfg">全文をコピー</button></div>
-        <pre class="code srcpre" id="s-cfg">/**
- * 営業支援コンソール｜設定
- * ------------------------------------------------------------------
- * 企業データから商談前の資料3点を自動生成する仕組みの設定ファイルです。
- * ★TODO の箇所を自社環境に合わせて設定してください。
- *
- * 設計：デジライズ ／ 実装・カスタマイズ：貴社
- * ------------------------------------------------------------------
- */
-
-// ========================= 営業支援設定（ここだけ編集） =========================
-const 営業支援設定 = {
-  // ★TODO: 企業データ台帳のスプレッドシートID（URLの /d/ と /edit の間）
-  SHEET_ID: &#x27;ここにスプレッドシートIDを貼る&#x27;,
-
-  // シート名（存在しなければ自動で作成されます）
-  SHEET_COMPANIES: &#x27;企業データ&#x27;,
-  SHEET_HISTORY:   &#x27;生成履歴&#x27;,
-
-  // ★TODO: 生成物の保存先フォルダID。この下にクライアント別フォルダを自動作成します
-  FOLDER_OUT: &#x27;ここに保存先フォルダIDを貼る&#x27;,
-
-  /**
-   * ★TODO: 3フォーマットのテンプレート（Googleドキュメント）のID
-   *
-   * テンプレートの作り方：
-   *   既存の見本をGoogleドキュメントとして保存し、
-   *   企業ごとに変わる箇所を {{企業名}} のような形に置き換えるだけです。
-   *   波かっこ2つで囲んだ箇所を、このコードが自動で埋めます。
-   */
-  TEMPLATES: {
-    quote:  { label: &#x27;見積書&#x27;,             docId: &#x27;ここに見積書テンプレートのIDを貼る&#x27; },
-    sim:    { label: &#x27;成果シミュレーション&#x27;, docId: &#x27;ここにシミュレーションのIDを貼る&#x27; },
-    design: { label: &#x27;業務設計書&#x27;,          docId: &#x27;ここに業務設計書のIDを貼る&#x27; },
-  },
-
-  /**
-   * 使用するモデル
-   *   &#x27;claude-opus-5&#x27;   … 既定。判断の質を優先する場合
-   *   &#x27;claude-sonnet-5&#x27; … 費用を優先する場合（要件定義の費用試算はこちらが前提）
-   */
-  MODEL: &#x27;claude-opus-5&#x27;,
-  MAX_TOKENS: 8000,
-
-  // 1回の生成でAIに渡す企業データの上限文字数（安全弁）
-  MAX_INPUT_CHARS: 12000,
-};
-// =========================================================================
-
-
-/** 企業データ台帳の列。CSVの見出しもこの名前に揃えます */
-const COMPANY_HEADERS = [
-  &#x27;企業名&#x27;, &#x27;業種&#x27;, &#x27;従業員数&#x27;, &#x27;売上高&#x27;, &#x27;事業内容&#x27;,
-  &#x27;所在地&#x27;, &#x27;代表者&#x27;, &#x27;設立年&#x27;, &#x27;決算月&#x27;, &#x27;利益&#x27;, &#x27;法人番号&#x27;, &#x27;備考&#x27;, &#x27;更新日&#x27;,
-];
-
-/** 生成に最低限必要な項目。欠けていると精度が落ちるため画面で警告します */
-const REQUIRED_FIELDS = [&#x27;企業名&#x27;, &#x27;業種&#x27;, &#x27;従業員数&#x27;, &#x27;売上高&#x27;, &#x27;事業内容&#x27;];
-
-/** 生成履歴の列 */
-const HISTORY_HEADERS = [
-  &#x27;実行日時&#x27;, &#x27;実行者&#x27;, &#x27;企業名&#x27;, &#x27;生成物&#x27;, &#x27;保存先&#x27;, &#x27;状態&#x27;, &#x27;備考&#x27;,
-];
-</pre>
-      </details>
-      <details class="src">
-        <summary><span class="fn">企業データ.gs</span><span class="pill req">必須</span><span class="sz">218行 / 約8KB</span></summary>
-        <p class="srcdesc">CSVの取り込みと台帳の読み書き。★API化するときはここだけ差し替え</p>
-        <div class="srcbar"><span class="srcfile">Apps Scriptでのファイル名：<b>企業データ</b></span><button type="button" data-copy-src="s-data">全文をコピー</button></div>
-        <pre class="code srcpre" id="s-data">/**
- * 営業支援コンソール｜企業データ台帳
- * ------------------------------------------------------------------
- * CSVの取り込みと、企業データ台帳の読み書きを担当します。
- *
- * ★API契約が決まったら、差し替えるのはこのファイルだけです。
- * 　importFromCsv_() と同じ形（COMPANY_HEADERS の並びの配列）を返す
- * 　importFromApi_() を書けば、他のファイルは一切変更が要りません。
- * ------------------------------------------------------------------
- */
-
-/** 台帳シートを取得（無ければ見出し付きで作成） */
-function getCompanySheet_() {
-  return getSheet_(営業支援設定.SHEET_COMPANIES, COMPANY_HEADERS);
-}
-
-/** ブック内のシートを取得（無ければ見出し付きで作成） */
-function getSheet_(name, headers) {
-  const ss = SpreadsheetApp.openById(営業支援設定.SHEET_ID);
-  let sh = ss.getSheetByName(name);
-  if (!sh) {
-    sh = ss.insertSheet(name);
-    sh.appendRow(headers);
-    sh.getRange(1, 1, 1, headers.length).setFontWeight(&#x27;bold&#x27;);
-    sh.setFrozenRows(1);
-  }
-  return sh;
-}
-
-/** 見出し行から「列名 → 列番号（0始まり）」を作る */
-function columnIndex_(headerRow) {
-  const map = {};
-  headerRow.forEach(function (h, i) {
-    const key = String(h || &#x27;&#x27;).normalize(&#x27;NFKC&#x27;).trim();
-    if (key &amp;&amp; map[key] === undefined) map[key] = i;
-  });
-  return map;
-}
-
-
-// --------------------------- 読み取り ---------------------------
-
-/**
- * 台帳の全企業を読む
- * 列は位置ではなく見出し名で探すため、列を足しても並べ替えても壊れません。
- */
-function readCompanies_() {
-  const sh = getCompanySheet_();
-  const values = sh.getDataRange().getValues();
-  if (values.length &lt; 2) return [];
-
-  const col = columnIndex_(values[0]);
-  const out = [];
-
-  for (let i = 1; i &lt; values.length; i++) {
-    const row = values[i];
-    const c = {};
-    COMPANY_HEADERS.forEach(function (h) {
-      c[h] = col[h] === undefined ? &#x27;&#x27; : row[col[h]];
-    });
-    if (!String(c[&#x27;企業名&#x27;] || &#x27;&#x27;).trim()) continue;
-    c._row = i + 1;                       // 更新時に使う行番号
-    c._missing = missingFields_(c);
-    out.push(c);
-  }
-  return out;
-}
-
-/** 企業名で1社を探す（表記ゆれを吸収して照合） */
-function findCompany_(name) {
-  const key = normName_(name);
-  return readCompanies_().filter(function (c) {
-    return normName_(c[&#x27;企業名&#x27;]) === key;
-  })[0] || null;
-}
-
-/** 必須項目のうち、空になっているものを返す */
-function missingFields_(c) {
-  return REQUIRED_FIELDS.filter(function (f) {
-    const v = c[f];
-    return v === &#x27;&#x27; || v === null || v === undefined || v === 0;
-  });
-}
-
-/** 企業名の照合キー（全角半角・空白・法人格の表記ゆれを吸収） */
-function normName_(v) {
-  return String(v || &#x27;&#x27;)
-    .normalize(&#x27;NFKC&#x27;)
-    .replace(/[\s　]/g, &#x27;&#x27;)
-    .replace(/株式会社|有限会社|合同会社|\(株\)|\(有\)/g, &#x27;&#x27;)
-    .toLowerCase();
-}
-
-
-// --------------------------- CSVの取り込み ---------------------------
-
-/**
- * CSVを台帳へ取り込む
- * ・1行目は見出し。COMPANY_HEADERS と同じ日本語名でも、英語列名でも受け付けます
- * ・既に台帳にある企業は上書き更新します（キーは企業名）
- *
- * @param {string} csvText アップロードされたCSVの中身
- * @return {Object} { added, updated, skipped, problems: [] }
- */
-function importFromCsv_(csvText) {
-  const rows = Utilities.parseCsv(csvText);
-  if (!rows || rows.length &lt; 2) {
-    return { added: 0, updated: 0, skipped: 0, problems: [&#x27;データ行がありません&#x27;] };
-  }
-
-  const col = csvHeaderIndex_(rows[0]);
-  if (col[&#x27;企業名&#x27;] === undefined) {
-    return { added: 0, updated: 0, skipped: 0,
-             problems: [&#x27;「企業名」にあたる列が見つかりません（company_name でも可）&#x27;] };
-  }
-
-  const sh = getCompanySheet_();
-  const existing = {};
-  readCompanies_().forEach(function (c) { existing[normName_(c[&#x27;企業名&#x27;])] = c._row; });
-
-  const today = Utilities.formatDate(new Date(), &#x27;Asia/Tokyo&#x27;, &#x27;yyyy-MM-dd&#x27;);
-  const problems = [];
-  const appends = [];
-  let added = 0, updated = 0, skipped = 0;
-
-  for (let i = 1; i &lt; rows.length; i++) {
-    const r = rows[i];
-    if (r.join(&#x27;&#x27;).trim() === &#x27;&#x27;) continue;
-
-    const rec = COMPANY_HEADERS.map(function (h) {
-      if (h === &#x27;更新日&#x27;) return today;
-      return col[h] === undefined ? &#x27;&#x27; : String(r[col[h]] || &#x27;&#x27;).trim();
-    });
-
-    const name = rec[COMPANY_HEADERS.indexOf(&#x27;企業名&#x27;)];
-    if (!name) { skipped++; problems.push((i + 1) + &#x27;行目：企業名が空のため取り込みませんでした&#x27;); continue; }
-
-    // 必須項目の欠けは記録するが、取り込み自体は行う（画面で補完できるため）
-    const asObj = {};
-    COMPANY_HEADERS.forEach(function (h, idx) { asObj[h] = rec[idx]; });
-    const miss = missingFields_(asObj);
-    if (miss.length) problems.push((i + 1) + &#x27;行目「&#x27; + name + &#x27;」：&#x27; + miss.join(&#x27;・&#x27;) + &#x27; が空欄です&#x27;);
-
-    const at = existing[normName_(name)];
-    if (at) {
-      sh.getRange(at, 1, 1, COMPANY_HEADERS.length).setValues([rec]);
-      updated++;
-    } else {
-      appends.push(rec);
-      added++;
-    }
-  }
-
-  if (appends.length) {
-    sh.getRange(sh.getLastRow() + 1, 1, appends.length, COMPANY_HEADERS.length).setValues(appends);
-  }
-
-  Logger.log(&#x27;取り込み：新規 %s / 更新 %s / 見送り %s&#x27;, added, updated, skipped);
-  return { added: added, updated: updated, skipped: skipped, problems: problems };
-}
-
-/**
- * CSVの見出しを COMPANY_HEADERS に対応づける
- * 日本語見出しでも、英語見出し（company_name 等）でも受け付けます。
- */
-const CSV_ALIASES = {
-  &#x27;企業名&#x27;: [&#x27;company_name&#x27;, &#x27;company&#x27;, &#x27;name&#x27;, &#x27;会社名&#x27;, &#x27;商号&#x27;],
-  &#x27;業種&#x27;: [&#x27;industry&#x27;, &#x27;sector&#x27;, &#x27;業界&#x27;],
-  &#x27;従業員数&#x27;: [&#x27;employees&#x27;, &#x27;employee_count&#x27;, &#x27;従業員&#x27;],
-  &#x27;売上高&#x27;: [&#x27;revenue&#x27;, &#x27;sales&#x27;, &#x27;売上&#x27;],
-  &#x27;事業内容&#x27;: [&#x27;business_desc&#x27;, &#x27;business&#x27;, &#x27;description&#x27;, &#x27;事業&#x27;],
-  &#x27;所在地&#x27;: [&#x27;address&#x27;, &#x27;location&#x27;, &#x27;住所&#x27;],
-  &#x27;代表者&#x27;: [&#x27;representative&#x27;, &#x27;ceo&#x27;, &#x27;代表&#x27;],
-  &#x27;設立年&#x27;: [&#x27;established&#x27;, &#x27;founded&#x27;, &#x27;設立&#x27;],
-  &#x27;決算月&#x27;: [&#x27;fiscal_month&#x27;, &#x27;fiscal&#x27;, &#x27;決算&#x27;],
-  &#x27;利益&#x27;: [&#x27;profit&#x27;, &#x27;income&#x27;],
-  &#x27;法人番号&#x27;: [&#x27;corporate_number&#x27;, &#x27;corp_no&#x27;],
-  &#x27;備考&#x27;: [&#x27;note&#x27;, &#x27;notes&#x27;, &#x27;memo&#x27;, &#x27;remarks&#x27;],
-};
-
-function csvHeaderIndex_(headerRow) {
-  const raw = headerRow.map(function (h) {
-    return String(h || &#x27;&#x27;).normalize(&#x27;NFKC&#x27;).replace(/[\s　]/g, &#x27;&#x27;).toLowerCase();
-  });
-  const map = {};
-  COMPANY_HEADERS.forEach(function (h) {
-    const cands = [h].concat(CSV_ALIASES[h] || []).map(function (x) {
-      return String(x).normalize(&#x27;NFKC&#x27;).replace(/[\s　]/g, &#x27;&#x27;).toLowerCase();
-    });
-    for (let i = 0; i &lt; raw.length; i++) {
-      if (cands.indexOf(raw[i]) &gt;= 0) { map[h] = i; break; }
-    }
-  });
-  return map;
-}
-
-
-// --------------------------- 動作確認用 ---------------------------
-
-/**
- * 【すぐ動きます】台帳に見本を3社入れて、読み取りと欠け判定を確認する
- * 実行後、ログに「企業名／不足項目」の一覧が出ます。
- */
-function testCompanyStore_() {
-  const csv =
-    &#x27;company_name,industry,employees,revenue,business_desc,address,note\n&#x27; +
-    &#x27;株式会社サンプル製作所,金属製品製造,120,2400000000,精密部品の受託加工,愛知県名古屋市,3期連続増収\n&#x27; +
-    &#x27;サンプル物流株式会社,運輸・倉庫,340,8800000000,チャーター便と3PL,静岡県浜松市,\n&#x27; +
-    &#x27;株式会社サンプルケア,,,,,福岡県福岡市,項目が欠けている例\n&#x27;;
-
-  const r = importFromCsv_(csv);
-  Logger.log(&#x27;取り込み結果：新規 %s / 更新 %s / 見送り %s&#x27;, r.added, r.updated, r.skipped);
-  r.problems.forEach(function (p) { Logger.log(&#x27;  &#x27; + p); });
-
-  readCompanies_().forEach(function (c) {
-    Logger.log(&#x27;%s ／ 不足:%s&#x27;, c[&#x27;企業名&#x27;], c._missing.length ? c._missing.join(&#x27;・&#x27;) : &#x27;なし&#x27;);
-  });
-}
-</pre>
-      </details>
-      <details class="src">
-        <summary><span class="fn">生成.gs</span><span class="pill req">必須</span><span class="sz">167行 / 約6KB</span></summary>
-        <p class="srcdesc">テンプレートの差し込み箇所を読み、Claudeに値を作らせる</p>
-        <div class="srcbar"><span class="srcfile">Apps Scriptでのファイル名：<b>生成</b></span><button type="button" data-copy-src="s-gen">全文をコピー</button></div>
-        <pre class="code srcpre" id="s-gen">/**
- * 営業支援コンソール｜資料の生成
- * ------------------------------------------------------------------
- * テンプレート（Googleドキュメント）から差し込み箇所を読み取り、
- * その箇所に入る値だけを Claude に作らせます。
- *
- * ★体裁はテンプレートが保証し、AIは中身だけを担当します。
- * 　これにより、生成のたびにレイアウトが崩れることがありません。
- * ------------------------------------------------------------------
- */
-
-/**
- * テンプレートから差し込み箇所を洗い出す
- * ドキュメント本文の {{ ... }} をすべて拾います。
- *
- * @return {string[]} 例：[&#x27;企業名&#x27;,&#x27;業種&#x27;,&#x27;合計金額&#x27;,&#x27;前提条件&#x27;]
- */
-function extractPlaceholders_(docId) {
-  const text = DocumentApp.openById(docId).getBody().getText();
-  const found = text.match(/\{\{\s*[^}]+\s*\}\}/g) || [];
-  const keys = found.map(function (t) {
-    return t.replace(/[{}]/g, &#x27;&#x27;).trim();
-  });
-  // 重複を除く
-  return keys.filter(function (k, i) { return k &amp;&amp; keys.indexOf(k) === i; });
-}
-
-
-/**
- * 1フォーマット分の差し込み値を生成する
- *
- * @param {Object} company 台帳から読んだ企業データ
- * @param {string} formatKey &#x27;quote&#x27; | &#x27;sim&#x27; | &#x27;design&#x27;
- * @param {string} extra 追加指示（再生成時のみ。無ければ空文字）
- * @return {Object} { 差し込みキー: 値 } の形
- */
-function generateValues_(company, formatKey, extra) {
-  const tpl = 営業支援設定.TEMPLATES[formatKey];
-  if (!tpl) throw new Error(&#x27;未知のフォーマットです：&#x27; + formatKey);
-
-  const keys = extractPlaceholders_(tpl.docId);
-  if (keys.length === 0) {
-    throw new Error(&#x27;テンプレート「&#x27; + tpl.label + &#x27;」に {{ }} の差し込み箇所が見つかりません&#x27;);
-  }
-
-  const prompt = buildPrompt_(company, tpl.label, keys, extra);
-  const raw = callClaude_(prompt);
-  const parsed = parseJson_(raw);
-
-  // テンプレートにある差し込み箇所を必ず全部埋める（欠けは空文字にして事故を防ぐ）
-  const values = {};
-  keys.forEach(function (k) {
-    values[k] = (parsed &amp;&amp; parsed[k] !== undefined &amp;&amp; parsed[k] !== null) ? String(parsed[k]) : &#x27;&#x27;;
-  });
-  return values;
-}
-
-
-/** Claudeへ渡す指示文を組み立てる */
-function buildPrompt_(company, formatLabel, keys, extra) {
-  const facts = COMPANY_HEADERS.filter(function (h) { return h !== &#x27;更新日&#x27;; })
-    .map(function (h) { return h + &#x27;：&#x27; + (company[h] === &#x27;&#x27; ? &#x27;（未登録）&#x27; : company[h]); })
-    .join(&#x27;\n&#x27;)
-    .slice(0, 営業支援設定.MAX_INPUT_CHARS);
-
-  return [
-    &#x27;あなたは法人向けの業務改善を提案するコンサルタントです。&#x27;,
-    &#x27;下記の企業データをもとに、「&#x27; + formatLabel + &#x27;」の差し込み箇所を埋めてください。&#x27;,
-    &#x27;&#x27;,
-    &#x27;【守っていただきたいこと】&#x27;,
-    &#x27;- 企業データに書かれていない事実を、推測して断定しないこと&#x27;,
-    &#x27;- 根拠が無い数値は出さないこと。試算する場合は前提を必ず併記すること&#x27;,
-    &#x27;- 「（未登録）」の項目は、その旨がわかる表現にするか、触れないこと&#x27;,
-    &#x27;- 出力はJSONのみ。説明文やマークダウンの装飾は付けないこと&#x27;,
-    &#x27;&#x27;,
-    &#x27;【企業データ】&#x27;,
-    facts,
-    &#x27;&#x27;,
-    extra ? &#x27;【今回の追加指示】\n&#x27; + extra + &#x27;\n&#x27; : &#x27;&#x27;,
-    &#x27;【出力するJSONのキー】&#x27;,
-    &#x27;次のキーをすべて含むJSONを1つだけ返してください。値はすべて文字列にしてください。&#x27;,
-    JSON.stringify(keys, null, 0),
-  ].join(&#x27;\n&#x27;);
-}
-
-
-/** Claude API を呼ぶ */
-function callClaude_(prompt) {
-  const key = PropertiesService.getScriptProperties().getProperty(&#x27;CLAUDE_API_KEY&#x27;);
-  if (!key) throw new Error(&#x27;スクリプトプロパティ CLAUDE_API_KEY が未設定です&#x27;);
-
-  const res = UrlFetchApp.fetch(&#x27;https://api.anthropic.com/v1/messages&#x27;, {
-    method: &#x27;post&#x27;,
-    contentType: &#x27;application/json&#x27;,
-    headers: { &#x27;x-api-key&#x27;: key, &#x27;anthropic-version&#x27;: &#x27;2023-06-01&#x27; },
-    payload: JSON.stringify({
-      model: 営業支援設定.MODEL,
-      max_tokens: 営業支援設定.MAX_TOKENS,
-      messages: [{ role: &#x27;user&#x27;, content: prompt }],
-    }),
-    muteHttpExceptions: true,
-  });
-
-  const code = res.getResponseCode();
-  if (code &lt; 200 || code &gt;= 300) {
-    throw new Error(&#x27;Claude APIエラー（&#x27; + code + &#x27;）：&#x27; + res.getContentText().slice(0, 300));
-  }
-
-  const json = JSON.parse(res.getContentText());
-  const blocks = json.content || [];
-  const text = blocks.filter(function (b) { return b.type === &#x27;text&#x27;; })
-                     .map(function (b) { return b.text; }).join(&#x27;&#x27;);
-  if (!text) throw new Error(&#x27;Claudeからの応答が空でした&#x27;);
-  return text;
-}
-
-
-/**
- * 応答からJSONを取り出す
- * 前後に説明文が付いた場合でも、最初の { から最後の } までを拾います。
- */
-function parseJson_(text) {
-  try {
-    return JSON.parse(text);
-  } catch (e) {
-    const s = text.indexOf(&#x27;{&#x27;), t = text.lastIndexOf(&#x27;}&#x27;);
-    if (s &gt;= 0 &amp;&amp; t &gt; s) {
-      try { return JSON.parse(text.slice(s, t + 1)); } catch (e2) { /* 次へ */ }
-    }
-    Logger.log(&#x27;JSONとして読めませんでした：&#x27; + text.slice(0, 200));
-    return null;
-  }
-}
-
-
-// --------------------------- 動作確認用 ---------------------------
-
-/**
- * 【テンプレートIDの設定後に実行】差し込み箇所が正しく読めるかを確認する
- * ログに、3フォーマットそれぞれの {{ }} の一覧が出ます。
- */
-function testPlaceholders_() {
-  Object.keys(営業支援設定.TEMPLATES).forEach(function (k) {
-    const tpl = 営業支援設定.TEMPLATES[k];
-    try {
-      const keys = extractPlaceholders_(tpl.docId);
-      Logger.log(&#x27;%s：%s箇所　%s&#x27;, tpl.label, keys.length, keys.join(&#x27; / &#x27;));
-    } catch (e) {
-      Logger.log(&#x27;%s：読み取れません（%s）&#x27;, tpl.label, e.message);
-    }
-  });
-}
-
-/**
- * 【APIキーの設定後に実行】1フォーマットだけ生成して結果をログに出す
- * ドキュメントは作らないため、生成内容だけを安全に確認できます。
- */
-function testGenerateOnly_() {
-  const company = readCompanies_()[0];
-  if (!company) { Logger.log(&#x27;台帳に企業がありません。先に testCompanyStore_() を実行してください&#x27;); return; }
-
-  const values = generateValues_(company, &#x27;sim&#x27;, &#x27;&#x27;);
-  Logger.log(&#x27;対象企業：%s&#x27;, company[&#x27;企業名&#x27;]);
-  Object.keys(values).forEach(function (k) {
-    Logger.log(&#x27;  {{%s}} → %s&#x27;, k, String(values[k]).slice(0, 120));
-  });
-}
-</pre>
-      </details>
-      <details class="src">
-        <summary><span class="fn">出力.gs</span><span class="pill req">必須</span><span class="sz">128行 / 約5KB</span></summary>
-        <p class="srcdesc">テンプレートを複製して差し込み、ドライブへ保存・履歴記録</p>
-        <div class="srcbar"><span class="srcfile">Apps Scriptでのファイル名：<b>出力</b></span><button type="button" data-copy-src="s-out">全文をコピー</button></div>
-        <pre class="code srcpre" id="s-out">/**
- * 営業支援コンソール｜生成物の出力
- * ------------------------------------------------------------------
- * テンプレートを複製し、{{ }} を差し込み値に置き換えて、
- * クライアント別フォルダへ保存します。
- *
- * ★元のテンプレートは複製元として使うだけで、書き換えません。
- * ------------------------------------------------------------------
- */
-
-/**
- * 1フォーマット分のドキュメントを作る
- *
- * @param {Object} company 企業データ
- * @param {string} formatKey &#x27;quote&#x27; | &#x27;sim&#x27; | &#x27;design&#x27;
- * @param {Object} values generateValues_() の戻り値
- * @return {Object} { name, url, id }
- */
-function renderDocument_(company, formatKey, values) {
-  const tpl = 営業支援設定.TEMPLATES[formatKey];
-  const folder = getClientFolder_(company[&#x27;企業名&#x27;]);
-  const stamp = Utilities.formatDate(new Date(), &#x27;Asia/Tokyo&#x27;, &#x27;yyyyMMdd&#x27;);
-  const name = [stamp, company[&#x27;企業名&#x27;], tpl.label].join(&#x27;_&#x27;);
-
-  // テンプレートを複製（テンプレート自体は変更しない）
-  const copy = DriveApp.getFileById(tpl.docId).makeCopy(name, folder);
-  const doc = DocumentApp.openById(copy.getId());
-  const body = doc.getBody();
-
-  // {{キー}} を値に置き換える
-  Object.keys(values).forEach(function (k) {
-    body.replaceText(placeholderPattern_(k), escapeForReplace_(values[k]));
-  });
-
-  // 埋め残しがあれば空文字にして、{{ }} が残ったまま顧客に出ないようにする
-  body.replaceText(&#x27;\\{\\{[^}]*\\}\\}&#x27;, &#x27;&#x27;);
-
-  doc.saveAndClose();
-  return { name: name, url: copy.getUrl(), id: copy.getId() };
-}
-
-
-/** {{キー}} を探す正規表現（記号が入っていても壊れないようにエスケープ） */
-function placeholderPattern_(key) {
-  const esc = String(key).replace(/[.*+?^${}()|[\]\\]/g, &#x27;\\$&amp;&#x27;);
-  return &#x27;\\{\\{\\s*&#x27; + esc + &#x27;\\s*\\}\\}&#x27;;
-}
-
-/** 置換文字列に含まれると誤動作する記号を無害化する */
-function escapeForReplace_(v) {
-  return String(v === undefined || v === null ? &#x27;&#x27; : v).replace(/\$/g, &#x27;$$$$&#x27;);
-}
-
-
-/**
- * クライアント別フォルダを取得（無ければ作成）
- * 保存先： 営業支援設定.FOLDER_OUT / 企業名 /
- */
-function getClientFolder_(companyName) {
-  const parent = DriveApp.getFolderById(営業支援設定.FOLDER_OUT);
-  const safe = String(companyName).replace(/[\/\\:*?&quot;&lt;&gt;|]/g, &#x27;_&#x27;).trim();
-  const it = parent.getFoldersByName(safe);
-  return it.hasNext() ? it.next() : parent.createFolder(safe);
-}
-
-
-// --------------------------- 生成履歴 ---------------------------
-
-/** 生成履歴に1行追記する */
-function logHistory_(company, formatKeys, results, status, note) {
-  const sh = getSheet_(営業支援設定.SHEET_HISTORY, HISTORY_HEADERS);
-  const labels = formatKeys.map(function (k) { return 営業支援設定.TEMPLATES[k].label; }).join(&#x27; / &#x27;);
-  const links = (results || []).map(function (r) { return r.url; }).join(&#x27;\n&#x27;);
-
-  sh.appendRow([
-    Utilities.formatDate(new Date(), &#x27;Asia/Tokyo&#x27;, &#x27;yyyy-MM-dd HH:mm&#x27;),
-    Session.getActiveUser().getEmail() || &#x27;(不明)&#x27;,
-    company[&#x27;企業名&#x27;],
-    labels,
-    links,
-    status,
-    note || &#x27;&#x27;,
-  ]);
-}
-
-/** 生成履歴を新しい順に読む（画面の③タブで使用） */
-function readHistory_(limit) {
-  const sh = getSheet_(営業支援設定.SHEET_HISTORY, HISTORY_HEADERS);
-  const values = sh.getDataRange().getValues();
-  if (values.length &lt; 2) return [];
-
-  const col = columnIndex_(values[0]);
-  const rows = [];
-  for (let i = values.length - 1; i &gt;= 1; i--) {
-    const r = values[i];
-    rows.push({
-      at:      String(r[col[&#x27;実行日時&#x27;]] || &#x27;&#x27;),
-      user:    String(r[col[&#x27;実行者&#x27;]] || &#x27;&#x27;),
-      company: String(r[col[&#x27;企業名&#x27;]] || &#x27;&#x27;),
-      formats: String(r[col[&#x27;生成物&#x27;]] || &#x27;&#x27;),
-      links:   String(r[col[&#x27;保存先&#x27;]] || &#x27;&#x27;),
-      status:  String(r[col[&#x27;状態&#x27;]] || &#x27;&#x27;),
-    });
-    if (limit &amp;&amp; rows.length &gt;= limit) break;
-  }
-  return rows;
-}
-
-
-// --------------------------- 動作確認用 ---------------------------
-
-/**
- * 【テンプレートと保存先の設定後に実行】ドキュメントを1本だけ作ってみる
- * AIは使わず、固定のダミー値で差し込みます。テンプレートと保存先の設定確認用です。
- */
-function testRenderOnly_() {
-  const company = readCompanies_()[0];
-  if (!company) { Logger.log(&#x27;台帳に企業がありません。先に testCompanyStore_() を実行してください&#x27;); return; }
-
-  const keys = extractPlaceholders_(営業支援設定.TEMPLATES.sim.docId);
-  const values = {};
-  keys.forEach(function (k) { values[k] = &#x27;【&#x27; + k + &#x27;のテスト値】&#x27;; });
-
-  const r = renderDocument_(company, &#x27;sim&#x27;, values);
-  Logger.log(&#x27;作成しました：%s&#x27;, r.name);
-  Logger.log(&#x27;URL：%s&#x27;, r.url);
-  Logger.log(&#x27;※確認したら、このファイルは削除してください&#x27;);
-}
-</pre>
-      </details>
-      <details class="src">
-        <summary><span class="fn">メイン.gs</span><span class="pill req">必須</span><span class="sz">153行 / 約6KB</span></summary>
-        <p class="srcdesc">Webアプリの入口と、画面から呼ばれるAPI</p>
-        <div class="srcbar"><span class="srcfile">Apps Scriptでのファイル名：<b>メイン</b></span><button type="button" data-copy-src="s-main">全文をコピー</button></div>
-        <pre class="code srcpre" id="s-main">/**
- * 営業支援コンソール｜メイン（Webアプリの入口）
- * ------------------------------------------------------------------
- * 画面（画面.html）から google.script.run で呼ばれるサーバー側の関数群です。
- * 画面には api_ で始まる関数だけを公開し、内部処理は _ で終わる名前にしています。
- *
- * デプロイ：デプロイ → 新しいデプロイ → 種類「ウェブアプリ」
- *   次のユーザーとして実行：自分
- *   アクセスできるユーザー：★社内の利用者に合わせて設定（後述の注意を参照）
- * ------------------------------------------------------------------
- */
-
-/** Webアプリを開いたときに呼ばれる */
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile(&#x27;画面&#x27;)
-    .setTitle(&#x27;営業支援コンソール&#x27;)
-    .addMetaTag(&#x27;viewport&#x27;, &#x27;width=device-width, initial-scale=1&#x27;);
-}
-
-
-// --------------------------- 画面から呼ぶAPI ---------------------------
-
-/**
- * ①タブ：企業を検索して一覧を返す
- * @param {string} q 検索語（空なら全件）
- */
-function api_listCompanies(q) {
-  const key = String(q || &#x27;&#x27;).normalize(&#x27;NFKC&#x27;).trim();
-  return readCompanies_()
-    .filter(function (c) {
-      if (!key) return true;
-      return String(c[&#x27;企業名&#x27;]).indexOf(key) &gt;= 0 || String(c[&#x27;業種&#x27;]).indexOf(key) &gt;= 0;
-    })
-    .map(function (c) {
-      return { name: c[&#x27;企業名&#x27;], industry: c[&#x27;業種&#x27;], missing: c._missing };
-    });
-}
-
-/** ①タブ：1社の詳細を返す */
-function api_getCompany(name) {
-  const c = findCompany_(name);
-  if (!c) throw new Error(&#x27;企業が見つかりません：&#x27; + name);
-  const out = {};
-  COMPANY_HEADERS.forEach(function (h) { out[h] = c[h]; });
-  out.missing = c._missing;
-  return out;
-}
-
-/**
- * ①タブ：資料を生成する（保存はまだしない）
- * プレビューで人が確認してから api_save を呼ぶ流れです。
- *
- * @param {string} name 企業名
- * @param {string[]} formatKeys [&#x27;quote&#x27;,&#x27;sim&#x27;,&#x27;design&#x27;] のいずれか
- * @param {string} extra 追加指示（再生成時のみ）
- */
-function api_generate(name, formatKeys, extra) {
-  const c = findCompany_(name);
-  if (!c) throw new Error(&#x27;企業が見つかりません：&#x27; + name);
-  if (!formatKeys || !formatKeys.length) throw new Error(&#x27;生成する資料が選ばれていません&#x27;);
-
-  const out = {};
-  formatKeys.forEach(function (k) {
-    out[k] = generateValues_(c, k, extra || &#x27;&#x27;);
-  });
-  return { company: c[&#x27;企業名&#x27;], missing: c._missing, values: out };
-}
-
-/**
- * ①タブ：確認済みの内容でドキュメントを作り、ドライブへ保存する
- *
- * @param {string} name 企業名
- * @param {Object} valuesByFormat api_generate の戻り値 values（画面で修正されている場合あり）
- */
-function api_save(name, valuesByFormat) {
-  const c = findCompany_(name);
-  if (!c) throw new Error(&#x27;企業が見つかりません：&#x27; + name);
-
-  const keys = Object.keys(valuesByFormat || {});
-  if (!keys.length) throw new Error(&#x27;保存する内容がありません&#x27;);
-
-  const results = [];
-  try {
-    keys.forEach(function (k) {
-      results.push(renderDocument_(c, k, valuesByFormat[k]));
-    });
-    logHistory_(c, keys, results, &#x27;正常&#x27;, &#x27;&#x27;);
-    return { saved: results, folder: getClientFolder_(c[&#x27;企業名&#x27;]).getUrl() };
-  } catch (e) {
-    logHistory_(c, keys, results, &#x27;エラー&#x27;, String(e));
-    throw e;
-  }
-}
-
-/**
- * ②タブ：CSVを取り込む
- * @param {string} csvText アップロードされたCSVの中身（UTF-8）
- */
-function api_importCsv(csvText) {
-  if (!csvText || !String(csvText).trim()) throw new Error(&#x27;CSVが空です&#x27;);
-  return importFromCsv_(String(csvText));
-}
-
-/** ②タブ：台帳の一覧を返す */
-function api_listAll() {
-  return readCompanies_().map(function (c) {
-    return {
-      name: c[&#x27;企業名&#x27;], industry: c[&#x27;業種&#x27;], employees: c[&#x27;従業員数&#x27;],
-      revenue: c[&#x27;売上高&#x27;], updated: c[&#x27;更新日&#x27;], missing: c._missing,
-    };
-  });
-}
-
-/** ②タブ：1項目を手で直す */
-function api_updateField(name, field, value) {
-  if (COMPANY_HEADERS.indexOf(field) &lt; 0) throw new Error(&#x27;不正な項目名です：&#x27; + field);
-  const c = findCompany_(name);
-  if (!c) throw new Error(&#x27;企業が見つかりません：&#x27; + name);
-
-  const sh = getCompanySheet_();
-  const col = columnIndex_(sh.getDataRange().getValues()[0]);
-  sh.getRange(c._row, col[field] + 1).setValue(value);
-  sh.getRange(c._row, col[&#x27;更新日&#x27;] + 1)
-    .setValue(Utilities.formatDate(new Date(), &#x27;Asia/Tokyo&#x27;, &#x27;yyyy-MM-dd&#x27;));
-  return api_getCompany(name);
-}
-
-/** ③タブ：生成履歴を返す */
-function api_listHistory() {
-  return readHistory_(100);
-}
-
-
-// --------------------------- 動作確認用 ---------------------------
-
-/**
- * 【設定がひととおり済んだら実行】画面を通さずに、生成から保存までを1回通す
- * ★実際にドキュメントが作られます。確認後は削除してください。
- */
-function testEndToEnd_() {
-  const list = api_listCompanies(&#x27;&#x27;);
-  if (!list.length) { Logger.log(&#x27;台帳に企業がありません。先に testCompanyStore_() を実行してください&#x27;); return; }
-
-  const name = list[0].name;
-  Logger.log(&#x27;対象：%s&#x27;, name);
-
-  const gen = api_generate(name, [&#x27;sim&#x27;], &#x27;&#x27;);
-  Logger.log(&#x27;生成できた差し込み箇所：%s&#x27;, Object.keys(gen.values.sim).length + &#x27;件&#x27;);
-
-  const saved = api_save(name, { sim: gen.values.sim });
-  Logger.log(&#x27;保存先フォルダ：%s&#x27;, saved.folder);
-  saved.saved.forEach(function (r) { Logger.log(&#x27;  %s → %s&#x27;, r.name, r.url); });
-}
-</pre>
-      </details>
-      <details class="src">
-        <summary><span class="fn">画面.html</span><span class="pill req">必須</span><span class="sz">302行 / 約16KB</span></summary>
-        <p class="srcdesc">3タブの画面。HTMLファイルとして追加する</p>
-        <div class="srcbar"><span class="srcfile">Apps Scriptでのファイル名：<b>画面</b></span><button type="button" data-copy-src="s-ui">全文をコピー</button></div>
-        <pre class="code srcpre" id="s-ui">&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;ja&quot;&gt;
-&lt;head&gt;
-&lt;base target=&quot;_top&quot;&gt;
-&lt;meta charset=&quot;utf-8&quot;&gt;
-&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;
-&lt;style&gt;
-  :root{
-    --paper:#F2F4F8; --surface:#fff; --surface-2:#EDF0F5;
-    --ink:#16203A; --muted:#6E7A8E; --rule:#D9DEE8; --rule-s:#BAC2D1;
-    --navy:#1F3864; --accent:#B8511A; --accent-s:#FBEDE3;
-    --ok:#2C6E49; --ok-s:#E3F0E8; --crit:#A33328; --crit-s:#F9E7E4;
-    --f:&quot;BIZ UDPGothic&quot;,&quot;Hiragino Kaku Gothic ProN&quot;,&quot;メイリオ&quot;,Meiryo,system-ui,sans-serif;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f);font-size:14px;line-height:1.7}
-  .app{max-width:1100px;margin:0 auto;background:var(--surface);min-height:100vh}
-  .bar{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--navy);color:#fff}
-  .bar b{font-size:15px}
-  .bar .who{margin-left:auto;font-size:12px;opacity:.85}
-  .tabs{display:flex;border-bottom:1px solid var(--rule);background:var(--surface-2);padding:0 10px;overflow-x:auto}
-  .tabs button{border:none;background:none;padding:12px 17px;cursor:pointer;font:700 13.5px var(--f);
-    color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap}
-  .tabs button[aria-selected=true]{color:var(--accent);border-bottom-color:var(--accent);background:var(--surface)}
-  .tabs button:disabled{color:var(--rule-s);cursor:not-allowed}
-  .pane{padding:22px 20px 60px}
-  .pane[hidden]{display:none}
-  h2{font-size:17px;margin:0 0 3px}
-  .pd{margin:0 0 18px;color:var(--muted);font-size:13px}
-  .grid{display:grid;gap:16px}
-  @media(min-width:840px){.grid.g2{grid-template-columns:330px 1fr}}
-  .card{border:1px solid var(--rule);border-radius:3px;background:var(--surface);margin-bottom:16px}
-  .card&gt;h3{margin:0;padding:10px 15px;font-size:12.5px;border-bottom:1px solid var(--rule);
-    background:var(--surface-2);display:flex;gap:9px;align-items:center}
-  .card&gt;h3 .st{font-size:10.5px;color:#fff;background:#2A4C86;padding:1px 7px;border-radius:2px}
-  .cb{padding:14px 15px}
-  input[type=text],input[type=search],textarea{width:100%;padding:8px 10px;border:1px solid var(--rule-s);
-    border-radius:3px;font:inherit;background:var(--surface);color:var(--ink)}
-  textarea{min-height:64px;resize:vertical}
-  label.ck{display:flex;gap:9px;align-items:flex-start;padding:9px 11px;border:1px solid var(--rule);
-    border-radius:3px;margin-bottom:7px;cursor:pointer}
-  label.ck:hover{background:var(--surface-2)}
-  label.ck input{margin:4px 0 0;accent-color:var(--accent)}
-  .btn{border:1px solid var(--accent);background:var(--accent);color:#fff;padding:8px 18px;
-    border-radius:3px;cursor:pointer;font:700 13.5px var(--f)}
-  .btn:disabled{background:var(--rule-s);border-color:var(--rule-s);cursor:not-allowed}
-  .btn.g{background:none;color:var(--accent)}
-  ul.list{list-style:none;margin:0;padding:0;max-height:280px;overflow-y:auto;border-top:1px solid var(--rule)}
-  ul.list li{border-bottom:1px solid var(--rule)}
-  ul.list button{width:100%;text-align:left;border:none;background:none;padding:9px 15px;cursor:pointer;color:var(--ink)}
-  ul.list button:hover{background:var(--surface-2)}
-  ul.list button[aria-current=true]{background:var(--accent-s);box-shadow:inset 3px 0 0 var(--accent)}
-  ul.list .nm{font-weight:700;font-size:13.5px;display:block}
-  ul.list .sb{font-size:11.5px;color:var(--muted)}
-  dl.kv{margin:0;display:grid;grid-template-columns:100px 1fr}
-  dl.kv dt{font-size:12px;color:var(--muted);padding:6px 0;border-bottom:1px solid var(--rule)}
-  dl.kv dd{margin:0;font-size:13.5px;padding:6px 0;border-bottom:1px solid var(--rule)}
-  dl.kv dd.mi{color:var(--crit);font-weight:700}
-  .note{padding:10px 13px;font-size:12.5px;border-left:3px solid var(--crit);background:var(--crit-s);margin:10px 0}
-  .note.ok{border-left-color:var(--ok);background:var(--ok-s)}
-  .msg{font-size:12.5px;color:var(--muted);min-height:20px;margin:8px 0 0}
-  .fld{border:1px solid var(--rule);border-radius:3px;margin-bottom:9px}
-  .fld&gt;summary{padding:9px 13px;cursor:pointer;font-weight:700;font-size:13.5px}
-  .fld .in{padding:12px 14px;border-top:1px solid var(--rule)}
-  .row{display:grid;grid-template-columns:150px 1fr;gap:8px;margin-bottom:8px;align-items:start}
-  .row label{font-size:12px;color:var(--muted);padding-top:8px}
-  table.tb{width:100%;border-collapse:collapse;font-size:13px}
-  table.tb th{font-size:11px;letter-spacing:.06em;color:var(--muted);text-align:left;
-    padding:8px 12px;border-bottom:1.5px solid var(--rule-s);white-space:nowrap}
-  table.tb td{padding:8px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
-  .tbw{overflow-x:auto;border:1px solid var(--rule);border-radius:3px}
-  .tag{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:2px}
-  .tag.ok{background:var(--ok-s);color:var(--ok)}
-  .tag.ng{background:var(--crit-s);color:var(--crit)}
-  .drop{border:2px dashed var(--rule-s);border-radius:4px;padding:26px;text-align:center;background:var(--surface-2)}
-&lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;div class=&quot;app&quot;&gt;
-  &lt;div class=&quot;bar&quot;&gt;&lt;b&gt;営業支援コンソール&lt;/b&gt;&lt;span class=&quot;who&quot; id=&quot;who&quot;&gt;&lt;/span&gt;&lt;/div&gt;
-
-  &lt;div class=&quot;tabs&quot; role=&quot;tablist&quot;&gt;
-    &lt;button role=&quot;tab&quot; aria-selected=&quot;true&quot;  aria-controls=&quot;p1&quot;&gt;① 企業プロファイル作成&lt;/button&gt;
-    &lt;button role=&quot;tab&quot; aria-selected=&quot;false&quot; aria-controls=&quot;p2&quot;&gt;② 企業データ&lt;/button&gt;
-    &lt;button role=&quot;tab&quot; aria-selected=&quot;false&quot; aria-controls=&quot;p3&quot;&gt;③ 生成履歴&lt;/button&gt;
-  &lt;/div&gt;
-
-  &lt;!-- ① --&gt;
-  &lt;section class=&quot;pane&quot; id=&quot;p1&quot; role=&quot;tabpanel&quot;&gt;
-    &lt;h2&gt;企業プロファイル作成&lt;/h2&gt;
-    &lt;p class=&quot;pd&quot;&gt;企業を選び、商談前の資料を生成します。保存は内容を確認してからです。&lt;/p&gt;
-    &lt;div class=&quot;grid g2&quot;&gt;
-      &lt;div&gt;
-        &lt;div class=&quot;card&quot;&gt;
-          &lt;h3&gt;&lt;span class=&quot;st&quot;&gt;STEP 1&lt;/span&gt;企業を選ぶ&lt;/h3&gt;
-          &lt;div class=&quot;cb&quot;&gt;&lt;input type=&quot;search&quot; id=&quot;q&quot; placeholder=&quot;企業名・業種で検索&quot;&gt;&lt;/div&gt;
-          &lt;ul class=&quot;list&quot; id=&quot;clist&quot;&gt;&lt;li&gt;&lt;div style=&quot;padding:14px 15px;color:var(--muted)&quot;&gt;読み込み中…&lt;/div&gt;&lt;/li&gt;&lt;/ul&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-      &lt;div&gt;
-        &lt;div class=&quot;card&quot; id=&quot;cDetail&quot; hidden&gt;
-          &lt;h3&gt;&lt;span class=&quot;st&quot;&gt;STEP 2&lt;/span&gt;データを確認する&lt;/h3&gt;
-          &lt;div class=&quot;cb&quot;&gt;&lt;dl class=&quot;kv&quot; id=&quot;kv&quot;&gt;&lt;/dl&gt;&lt;div id=&quot;lack&quot;&gt;&lt;/div&gt;&lt;/div&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;card&quot; id=&quot;cGen&quot; hidden&gt;
-          &lt;h3&gt;&lt;span class=&quot;st&quot;&gt;STEP 3&lt;/span&gt;生成する資料を選ぶ&lt;/h3&gt;
-          &lt;div class=&quot;cb&quot;&gt;
-            &lt;label class=&quot;ck&quot;&gt;&lt;input type=&quot;checkbox&quot; class=&quot;f&quot; value=&quot;quote&quot; checked&gt;&lt;span&gt;&lt;b&gt;① 見積書&lt;/b&gt;&lt;/span&gt;&lt;/label&gt;
-            &lt;label class=&quot;ck&quot;&gt;&lt;input type=&quot;checkbox&quot; class=&quot;f&quot; value=&quot;sim&quot; checked&gt;&lt;span&gt;&lt;b&gt;② 成果シミュレーション&lt;/b&gt;&lt;/span&gt;&lt;/label&gt;
-            &lt;label class=&quot;ck&quot;&gt;&lt;input type=&quot;checkbox&quot; class=&quot;f&quot; value=&quot;design&quot; checked&gt;&lt;span&gt;&lt;b&gt;③ 業務設計書&lt;/b&gt;&lt;/span&gt;&lt;/label&gt;
-            &lt;textarea id=&quot;extra&quot; placeholder=&quot;追加の指示があれば（任意）例：定着支援は6ヶ月で&quot;&gt;&lt;/textarea&gt;
-            &lt;p&gt;&lt;button class=&quot;btn&quot; id=&quot;run&quot;&gt;生成する&lt;/button&gt;&lt;/p&gt;
-            &lt;p class=&quot;msg&quot; id=&quot;gmsg&quot;&gt;&lt;/p&gt;
-          &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;card&quot; id=&quot;cOut&quot; hidden&gt;
-          &lt;h3&gt;&lt;span class=&quot;st&quot;&gt;STEP 4&lt;/span&gt;確認して保存する&lt;/h3&gt;
-          &lt;div class=&quot;cb&quot;&gt;
-            &lt;div class=&quot;note&quot;&gt;保存前に必ず内容をご確認ください。値はこの画面で直接直せます。&lt;/div&gt;
-            &lt;div id=&quot;outs&quot;&gt;&lt;/div&gt;
-            &lt;p&gt;&lt;button class=&quot;btn&quot; id=&quot;save&quot;&gt;ドライブへ保存する&lt;/button&gt;
-               &lt;button class=&quot;btn g&quot; id=&quot;again&quot;&gt;条件を変えて作り直す&lt;/button&gt;&lt;/p&gt;
-            &lt;p class=&quot;msg&quot; id=&quot;smsg&quot;&gt;&lt;/p&gt;
-          &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;card&quot; id=&quot;cEmpty&quot;&gt;
-          &lt;h3&gt;企業を選んでください&lt;/h3&gt;
-          &lt;div class=&quot;cb&quot; style=&quot;color:var(--muted);font-size:13px&quot;&gt;
-            左の一覧から企業を選ぶと、登録内容と生成メニューが出ます。
-          &lt;/div&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  &lt;/section&gt;
-
-  &lt;!-- ② --&gt;
-  &lt;section class=&quot;pane&quot; id=&quot;p2&quot; role=&quot;tabpanel&quot; hidden&gt;
-    &lt;h2&gt;企業データ&lt;/h2&gt;
-    &lt;p class=&quot;pd&quot;&gt;CSVを取り込んで台帳を更新します。1行目は見出し・UTF-8で保存してください。&lt;/p&gt;
-    &lt;div class=&quot;drop&quot;&gt;
-      &lt;p style=&quot;margin:0 0 10px;font-weight:700&quot;&gt;CSVファイルを選んでください&lt;/p&gt;
-      &lt;input type=&quot;file&quot; id=&quot;csv&quot; accept=&quot;.csv,text/csv&quot;&gt;
-    &lt;/div&gt;
-    &lt;p class=&quot;msg&quot; id=&quot;imsg&quot;&gt;&lt;/p&gt;
-    &lt;div id=&quot;ires&quot;&gt;&lt;/div&gt;
-    &lt;h3 style=&quot;font-size:13.5px;margin:20px 0 8px&quot;&gt;取り込み済みの企業（&lt;span id=&quot;cnt&quot;&gt;-&lt;/span&gt;社）&lt;/h3&gt;
-    &lt;div class=&quot;tbw&quot;&gt;&lt;table class=&quot;tb&quot;&gt;
-      &lt;thead&gt;&lt;tr&gt;&lt;th&gt;企業名&lt;/th&gt;&lt;th&gt;業種&lt;/th&gt;&lt;th&gt;従業員&lt;/th&gt;&lt;th&gt;売上高&lt;/th&gt;&lt;th&gt;状態&lt;/th&gt;&lt;th&gt;更新日&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
-      &lt;tbody id=&quot;tb2&quot;&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
-  &lt;/section&gt;
-
-  &lt;!-- ③ --&gt;
-  &lt;section class=&quot;pane&quot; id=&quot;p3&quot; role=&quot;tabpanel&quot; hidden&gt;
-    &lt;h2&gt;生成履歴&lt;/h2&gt;
-    &lt;p class=&quot;pd&quot;&gt;いつ・誰が・どの企業で何を生成したかの記録です。&lt;/p&gt;
-    &lt;div class=&quot;tbw&quot;&gt;&lt;table class=&quot;tb&quot;&gt;
-      &lt;thead&gt;&lt;tr&gt;&lt;th&gt;日時&lt;/th&gt;&lt;th&gt;実行者&lt;/th&gt;&lt;th&gt;企業名&lt;/th&gt;&lt;th&gt;生成物&lt;/th&gt;&lt;th&gt;状態&lt;/th&gt;&lt;th&gt;保存先&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
-      &lt;tbody id=&quot;tb3&quot;&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
-  &lt;/section&gt;
-&lt;/div&gt;
-
-&lt;script&gt;
-var LABEL={quote:&#x27;見積書&#x27;,sim:&#x27;成果シミュレーション&#x27;,design:&#x27;業務設計書&#x27;};
-var sel=null, gen=null;
-function $(i){return document.getElementById(i)}
-function esc(s){return String(s==null?&#x27;&#x27;:s).replace(/[&amp;&lt;&gt;&quot;]/g,function(c){
-  return {&#x27;&amp;&#x27;:&#x27;&amp;amp;&#x27;,&#x27;&lt;&#x27;:&#x27;&amp;lt;&#x27;,&#x27;&gt;&#x27;:&#x27;&amp;gt;&#x27;,&#x27;&quot;&#x27;:&#x27;&amp;quot;&#x27;}[c]})}
-
-/* タブ */
-var tabs=document.querySelectorAll(&#x27;.tabs button[aria-controls]&#x27;);
-tabs.forEach(function(b){b.addEventListener(&#x27;click&#x27;,function(){
-  tabs.forEach(function(x){var on=x===b;
-    x.setAttribute(&#x27;aria-selected&#x27;,on?&#x27;true&#x27;:&#x27;false&#x27;);
-    $(x.getAttribute(&#x27;aria-controls&#x27;)).hidden=!on;});
-  if(b.getAttribute(&#x27;aria-controls&#x27;)===&#x27;p2&#x27;) loadAll();
-  if(b.getAttribute(&#x27;aria-controls&#x27;)===&#x27;p3&#x27;) loadHistory();
-});});
-
-/* ① 一覧 */
-function loadList(){
-  google.script.run.withSuccessHandler(function(rows){
-    $(&#x27;clist&#x27;).innerHTML = rows.length ? rows.map(function(c){
-      return &#x27;&lt;li&gt;&lt;button data-n=&quot;&#x27;+esc(c.name)+&#x27;&quot; aria-current=&quot;&#x27;+(sel&amp;&amp;sel[&#x27;企業名&#x27;]===c.name)+&#x27;&quot;&gt;&#x27;+
-        &#x27;&lt;span class=&quot;nm&quot;&gt;&#x27;+esc(c.name)+&#x27;&lt;/span&gt;&lt;span class=&quot;sb&quot;&gt;&#x27;+esc(c.industry||&#x27;業種未登録&#x27;)+
-        (c.missing.length?&#x27; ／ 要補完&#x27;+c.missing.length:&#x27;&#x27;)+&#x27;&lt;/span&gt;&lt;/button&gt;&lt;/li&gt;&#x27;;
-    }).join(&#x27;&#x27;) : &#x27;&lt;li&gt;&lt;div style=&quot;padding:14px 15px;color:var(--muted)&quot;&gt;該当なし&lt;/div&gt;&lt;/li&gt;&#x27;;
-    $(&#x27;clist&#x27;).querySelectorAll(&#x27;button&#x27;).forEach(function(b){
-      b.addEventListener(&#x27;click&#x27;,function(){pick(b.dataset.n)});
-    });
-  }).withFailureHandler(err).api_listCompanies($(&#x27;q&#x27;).value);
-}
-$(&#x27;q&#x27;).addEventListener(&#x27;input&#x27;,loadList);
-
-function pick(name){
-  google.script.run.withSuccessHandler(function(c){
-    sel=c; gen=null; loadList();
-    $(&#x27;cEmpty&#x27;).hidden=true; $(&#x27;cDetail&#x27;).hidden=false; $(&#x27;cGen&#x27;).hidden=false;
-    $(&#x27;cOut&#x27;).hidden=true; $(&#x27;gmsg&#x27;).textContent=&#x27;&#x27;; $(&#x27;smsg&#x27;).textContent=&#x27;&#x27;;
-    var keys=[&#x27;企業名&#x27;,&#x27;業種&#x27;,&#x27;従業員数&#x27;,&#x27;売上高&#x27;,&#x27;事業内容&#x27;,&#x27;所在地&#x27;,&#x27;備考&#x27;];
-    $(&#x27;kv&#x27;).innerHTML=keys.map(function(k){
-      var v=c[k], mi=(v===&#x27;&#x27;||v===null||v===undefined);
-      return &#x27;&lt;dt&gt;&#x27;+k+&#x27;&lt;/dt&gt;&lt;dd class=&quot;&#x27;+(mi?&#x27;mi&#x27;:&#x27;&#x27;)+&#x27;&quot;&gt;&#x27;+(mi?&#x27;未登録&#x27;:esc(v))+&#x27;&lt;/dd&gt;&#x27;;
-    }).join(&#x27;&#x27;);
-    $(&#x27;lack&#x27;).innerHTML = c.missing.length
-      ? &#x27;&lt;div class=&quot;note&quot;&gt;&lt;b&gt;必須項目が&#x27;+c.missing.length+&#x27;件不足しています：&#x27;+c.missing.join(&#x27;・&#x27;)+
-        &#x27;&lt;/b&gt;&lt;br&gt;このままでも生成できますが、精度が落ちます。②タブで補完できます。&lt;/div&gt;&#x27;
-      : &#x27;&lt;div class=&quot;note ok&quot;&gt;必須項目はすべて揃っています。&lt;/div&gt;&#x27;;
-  }).withFailureHandler(err).api_getCompany(name);
-}
-
-/* ① 生成 */
-$(&#x27;run&#x27;).addEventListener(&#x27;click&#x27;,function(){
-  var fs=[].slice.call(document.querySelectorAll(&#x27;.f:checked&#x27;)).map(function(x){return x.value});
-  if(!fs.length){$(&#x27;gmsg&#x27;).textContent=&#x27;生成する資料を1つ以上選んでください&#x27;;return;}
-  $(&#x27;run&#x27;).disabled=true; $(&#x27;gmsg&#x27;).textContent=&#x27;生成しています…（30秒ほどかかります）&#x27;;
-  google.script.run.withSuccessHandler(function(r){
-    gen=r; $(&#x27;run&#x27;).disabled=false; $(&#x27;gmsg&#x27;).textContent=&#x27;生成が完了しました。内容を確認してください。&#x27;;
-    $(&#x27;outs&#x27;).innerHTML=Object.keys(r.values).map(function(k,i){
-      var v=r.values[k];
-      return &#x27;&lt;details class=&quot;fld&quot;&#x27;+(i===0?&#x27; open&#x27;:&#x27;&#x27;)+&#x27;&gt;&lt;summary&gt;&#x27;+LABEL[k]+&#x27;&lt;/summary&gt;&lt;div class=&quot;in&quot;&gt;&#x27;+
-        Object.keys(v).map(function(key){
-          return &#x27;&lt;div class=&quot;row&quot;&gt;&lt;label&gt;{{&#x27;+esc(key)+&#x27;}}&lt;/label&gt;&#x27;+
-            &#x27;&lt;textarea data-f=&quot;&#x27;+esc(k)+&#x27;&quot; data-k=&quot;&#x27;+esc(key)+&#x27;&quot;&gt;&#x27;+esc(v[key])+&#x27;&lt;/textarea&gt;&lt;/div&gt;&#x27;;
-        }).join(&#x27;&#x27;)+&#x27;&lt;/div&gt;&lt;/details&gt;&#x27;;
-    }).join(&#x27;&#x27;);
-    $(&#x27;cOut&#x27;).hidden=false;
-  }).withFailureHandler(function(e){$(&#x27;run&#x27;).disabled=false;err(e)})
-    .api_generate(sel[&#x27;企業名&#x27;],fs,$(&#x27;extra&#x27;).value);
-});
-
-$(&#x27;again&#x27;).addEventListener(&#x27;click&#x27;,function(){
-  $(&#x27;cOut&#x27;).hidden=true; $(&#x27;extra&#x27;).focus();
-  $(&#x27;gmsg&#x27;).textContent=&#x27;追加の指示を入れて、もう一度「生成する」を押してください。&#x27;;
-});
-
-/* ① 保存 */
-$(&#x27;save&#x27;).addEventListener(&#x27;click&#x27;,function(){
-  if(!gen){return}
-  var vals={};
-  document.querySelectorAll(&#x27;#outs textarea&#x27;).forEach(function(t){
-    var f=t.dataset.f; vals[f]=vals[f]||{}; vals[f][t.dataset.k]=t.value;
-  });
-  $(&#x27;save&#x27;).disabled=true; $(&#x27;smsg&#x27;).textContent=&#x27;保存しています…&#x27;;
-  google.script.run.withSuccessHandler(function(r){
-    $(&#x27;save&#x27;).disabled=false;
-    $(&#x27;smsg&#x27;).innerHTML=&#x27;保存しました：&lt;a href=&quot;&#x27;+r.folder+&#x27;&quot; target=&quot;_blank&quot;&gt;クライアント別フォルダを開く&lt;/a&gt;&#x27;;
-  }).withFailureHandler(function(e){$(&#x27;save&#x27;).disabled=false;err(e)})
-    .api_save(sel[&#x27;企業名&#x27;],vals);
-});
-
-/* ② */
-$(&#x27;csv&#x27;).addEventListener(&#x27;change&#x27;,function(e){
-  var f=e.target.files[0]; if(!f)return;
-  var rd=new FileReader();
-  rd.onload=function(){
-    $(&#x27;imsg&#x27;).textContent=&#x27;取り込んでいます…&#x27;;
-    google.script.run.withSuccessHandler(function(r){
-      $(&#x27;imsg&#x27;).textContent=&#x27;&#x27;;
-      $(&#x27;ires&#x27;).innerHTML=&#x27;&lt;div class=&quot;note ok&quot;&gt;&lt;b&gt;新規 &#x27;+r.added+&#x27;社 ／ 更新 &#x27;+r.updated+
-        &#x27;社 ／ 見送り &#x27;+r.skipped+&#x27;件&lt;/b&gt;&#x27;+
-        (r.problems.length?&#x27;&lt;br&gt;&#x27;+r.problems.map(esc).join(&#x27;&lt;br&gt;&#x27;):&#x27;&#x27;)+&#x27;&lt;/div&gt;&#x27;;
-      loadAll();
-    }).withFailureHandler(err).api_importCsv(rd.result);
-  };
-  rd.readAsText(f,&#x27;UTF-8&#x27;);
-});
-
-function loadAll(){
-  google.script.run.withSuccessHandler(function(rows){
-    $(&#x27;cnt&#x27;).textContent=rows.length;
-    $(&#x27;tb2&#x27;).innerHTML=rows.map(function(c){
-      return &#x27;&lt;tr&gt;&lt;td&gt;&lt;b&gt;&#x27;+esc(c.name)+&#x27;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&#x27;+esc(c.industry||&#x27;—&#x27;)+&#x27;&lt;/td&gt;&#x27;+
-        &#x27;&lt;td&gt;&#x27;+esc(c.employees||&#x27;—&#x27;)+&#x27;&lt;/td&gt;&lt;td&gt;&#x27;+esc(c.revenue||&#x27;—&#x27;)+&#x27;&lt;/td&gt;&lt;td&gt;&#x27;+
-        (c.missing.length?&#x27;&lt;span class=&quot;tag ng&quot;&gt;要補完 &#x27;+c.missing.length+&#x27;&lt;/span&gt;&#x27;:&#x27;&lt;span class=&quot;tag ok&quot;&gt;完備&lt;/span&gt;&#x27;)+
-        &#x27;&lt;/td&gt;&lt;td&gt;&#x27;+esc(c.updated||&#x27;—&#x27;)+&#x27;&lt;/td&gt;&lt;/tr&gt;&#x27;;
-    }).join(&#x27;&#x27;);
-  }).withFailureHandler(err).api_listAll();
-}
-
-/* ③ */
-function loadHistory(){
-  google.script.run.withSuccessHandler(function(rows){
-    $(&#x27;tb3&#x27;).innerHTML=rows.map(function(h){
-      var links=String(h.links||&#x27;&#x27;).split(&#x27;\n&#x27;).filter(Boolean).map(function(u,i){
-        return &#x27;&lt;a href=&quot;&#x27;+esc(u)+&#x27;&quot; target=&quot;_blank&quot;&gt;開く&#x27;+(i+1)+&#x27;&lt;/a&gt;&#x27;;
-      }).join(&#x27; &#x27;);
-      return &#x27;&lt;tr&gt;&lt;td&gt;&#x27;+esc(h.at)+&#x27;&lt;/td&gt;&lt;td&gt;&#x27;+esc(h.user)+&#x27;&lt;/td&gt;&lt;td&gt;&lt;b&gt;&#x27;+esc(h.company)+
-        &#x27;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&#x27;+esc(h.formats)+&#x27;&lt;/td&gt;&lt;td&gt;&#x27;+esc(h.status)+&#x27;&lt;/td&gt;&lt;td&gt;&#x27;+links+&#x27;&lt;/td&gt;&lt;/tr&gt;&#x27;;
-    }).join(&#x27;&#x27;)||&#x27;&lt;tr&gt;&lt;td colspan=&quot;6&quot; style=&quot;color:var(--muted)&quot;&gt;履歴はまだありません&lt;/td&gt;&lt;/tr&gt;&#x27;;
-  }).withFailureHandler(err).api_listHistory();
-}
-
-function err(e){
-  var m=(e&amp;&amp;e.message)?e.message:String(e);
-  $(&#x27;gmsg&#x27;).textContent=&#x27;&#x27;; $(&#x27;smsg&#x27;).textContent=&#x27;&#x27;;
-  alert(&#x27;エラー：&#x27;+m);
-}
-
-loadList();
-&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</pre>
-      </details>
-</section>
-
-<!-- ============ 07 ============ -->
-<section class="sec" id="s7">
-  <div class="sec-head"><span class="sec-num">07</span><h2>動作確認の順序</h2></div>
-  <p class="lede">上から順に実行してください。設定が足りない場合は、その関数だけが止まります。</p>
-  <div class="scroller">
-    <table>
-      <thead><tr><th>#</th><th>実行する関数</th><th>確認できること</th><th>事前に必要なもの</th></tr></thead>
-      <tbody>
-        <tr><td class="m">1</td><td class="m">testCompanyStore_()</td><td>CSVの取り込みと、必須項目の欠け判定。見本3社が台帳に入ります</td><td>シートID</td></tr>
-        <tr><td class="m">2</td><td class="m">testPlaceholders_()</td><td>テンプレートの <code class="inl">{{ }}</code> が正しく読めるか</td><td>テンプレートID</td></tr>
-        <tr><td class="m">3</td><td class="m">testGenerateOnly_()</td><td>AIの生成内容。<strong>ドキュメントは作りません</strong></td><td>APIキー</td></tr>
-        <tr><td class="m">4</td><td class="m">testRenderOnly_()</td><td>テンプレートの複製と保存先。<strong>AIは使いません</strong></td><td>保存先フォルダID</td></tr>
-        <tr><td class="m">5</td><td class="m">testEndToEnd_()</td><td>生成から保存までを1本通す</td><td>1〜4が通ること</td></tr>
-        <tr><td class="m">6</td><td class="k">画面を開く</td><td>デプロイしたURLを開き、3タブを操作</td><td>デプロイ</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="note ok">
-    <span class="lbl">3と4を分けてある理由</span>
-    <p><strong>3はAIだけ、4はドキュメント作成だけ</strong>を確認します。
-    分けておくと、うまくいかないときに<strong>AIの問題かテンプレートの問題かがすぐ分かります</strong>。
-    5でまとめて通すのは、両方が通ったあとで構いません。</p>
-  </div>
-  <div class="note warn">
-    <span class="lbl">初回実行時は承認画面が出ます</span>
-    <ol>
-      <li><strong>権限を確認</strong> → アカウントを選択</li>
-      <li>「このアプリは Google で確認されていません」→ <strong>詳細</strong></li>
-      <li><strong>「（安全ではないページ）に移動」</strong> → <strong>許可</strong></li>
-    </ol>
-    <p>ご自身で作ったスクリプトのため、この表示で問題ありません。</p>
-  </div>
-</section>
-
-<!-- ============ 08 ============ -->
-<section class="sec" id="s8">
-  <div class="sec-head"><span class="sec-num">08</span><h2>注意点と未実装</h2></div>
-
-  <h3>設計上の注意</h3>
+  <h3>スキルを使ううえでの制約</h3>
   <div class="scroller">
     <table>
       <thead><tr><th>項目</th><th>内容</th></tr></thead>
       <tbody>
-        <tr><td class="k">保存は必ず人の確認後</td><td>生成しただけでは保存されません。画面で値を直してから保存する流れです。見積書は金額が入るため、この順序は変えないことをおすすめします</td></tr>
-        <tr><td class="k">埋め残しは空文字にする</td><td>AIが値を返さなかった箇所は空にします。<code class="inl">{{ }}</code> が残ったまま顧客に出ることを防ぐためです</td></tr>
-        <tr><td class="k">テンプレートは複製元</td><td>元のテンプレートは書き換えません。誤って壊すことがない作りです</td></tr>
-        <tr><td class="k">必須項目が欠けても止めない</td><td>警告は出しますが生成はできます。データが揃うまで使えないより、精度が落ちても使えるほうが実務に合うためです</td></tr>
-        <tr><td class="k">実行時間</td><td>3フォーマットで30〜60秒程度。Apps Scriptの上限6分には十分収まります</td></tr>
+        <tr><td class="k">プラン要件</td><td>claude.ai でカスタムスキルを使うには <strong>Pro / Max / Team / Enterprise</strong> が必要（コード実行が有効であること）</td></tr>
+        <tr><td class="k">共有範囲</td><td><strong>claude.ai のカスタムスキルは個人ごと</strong>。組織全体への配布や管理者による一括管理はできません。営業メンバー全員で使う場合は各自でアップロードが必要です</td></tr>
+        <tr><td class="k">サーフェス間で同期しない</td><td>claude.ai に上げたスキルは<strong>API側では使えません</strong>（逆も同じ）。経路Bへ移るときは、同じ中身をAPI側へ登録し直します</td></tr>
+        <tr><td class="k">経路Bのサンドボックス</td><td>APIの実行環境は<strong>ネットワーク接続を持ちません</strong>。そのためドライブを直接読めず、アプリが渡す形になります</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- 06 -->
+<section class="sec" id="s6">
+  <div class="sec-head"><span class="sec-num">06</span><h2>機能要件（経路B）</h2></div>
+  <p class="lede">アプリで量産する段階の要件です。経路Aでは画面を作らないため、この章は不要になります。</p>
+
+  <h3>① 企業プロファイル作成タブ</h3>
+  <div class="scroller">
+    <table>
+      <thead><tr><th>#</th><th>機能</th><th>内容</th><th>優先</th></tr></thead>
+      <tbody>
+        <tr><td class="m">F-1</td><td class="k">企業の検索・選択</td><td>台帳から企業名で検索し、候補から選ぶ</td><td><span class="pill req">必須</span></td></tr>
+        <tr><td class="m">F-2</td><td class="k">生成対象の選択</td><td>①②③から選ぶ（複数可）</td><td><span class="pill req">必須</span></td></tr>
+        <tr><td class="m">F-3</td><td class="k">不足項目の確認</td><td>必須項目が欠けていれば生成前に警告し、その場で入力できる</td><td><span class="pill req">必須</span></td></tr>
+        <tr><td class="m">F-4</td><td class="k">生成の実行</td><td>ボタン1つで生成。進捗を表示</td><td><span class="pill req">必須</span></td></tr>
+        <tr><td class="m">F-5</td><td class="k">プレビューと保存</td><td>内容を確認してからドライブへ保存</td><td><span class="pill req">必須</span></td></tr>
+        <tr><td class="m">F-6</td><td class="k">再生成</td><td>気に入らない場合、指示を足して作り直す</td><td><span class="pill rec">推奨</span></td></tr>
       </tbody>
     </table>
   </div>
 
-  <h3>使用モデルについて</h3>
-  <p>
-    設定の既定は <code class="inl">claude-opus-5</code> です。
-    <strong>要件定義の費用試算（月2,600円）は <code class="inl">claude-sonnet-5</code> を前提</strong>にしているため、
-    費用を優先する場合は設定を書き換えてください。3フォーマット×100件の想定なら、
-    どちらでも月数千円の範囲です。
-  </p>
-
-  <h3>今回入れていないもの</h3>
+  <h3>② 企業データタブ</h3>
   <div class="scroller">
     <table>
-      <thead><tr><th>機能</th><th>状態</th><th>備考</th></tr></thead>
+      <thead><tr><th>#</th><th>機能</th><th>内容</th><th>優先</th></tr></thead>
       <tbody>
-        <tr><td class="k">台帳の手動補正（画面から）</td><td><span class="pill rec">サーバー側のみ実装</span></td><td><code class="inl">api_updateField</code> は用意済み。画面に入力欄を足せば動きます</td></tr>
-        <tr><td class="k">企業データのAPI取得</td><td><span class="pill opt">未着手</span></td><td>契約が決まってから。「企業データ」ファイルのみの差し替えで済みます</td></tr>
-        <tr><td class="k">生成物のPDF化</td><td><span class="pill opt">未着手</span></td><td>Googleドキュメントからのエクスポートで対応可能です</td></tr>
+        <tr><td class="m">F-7</td><td class="k">CSVの取り込み</td><td>アップロード → 検証 → 台帳へ反映。既存企業は上書き</td><td><span class="pill req">必須</span></td></tr>
+        <tr><td class="m">F-8</td><td class="k">取り込み結果の表示</td><td>成功件数・更新件数・不備のある行を一覧表示</td><td><span class="pill req">必須</span></td></tr>
+        <tr><td class="m">F-9</td><td class="k">企業一覧・手動補正</td><td>台帳を画面で確認し、項目を直せる</td><td><span class="pill rec">推奨</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>③ 生成履歴タブ</h3>
+  <div class="scroller">
+    <table>
+      <thead><tr><th>#</th><th>機能</th><th>内容</th><th>優先</th></tr></thead>
+      <tbody>
+        <tr><td class="m">F-10</td><td class="k">履歴の一覧</td><td>日時・実行者・企業名・生成物・保存先リンク</td><td><span class="pill rec">推奨</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note warn">
+    <span class="lbl">生成物は必ず人が確認してから使う前提です</span>
+    <p>F-5でプレビューを挟むのは、<strong>AIの生成物をそのまま顧客に出さない</strong>ためです。
+    とくに見積書は金額が入るため、承認なしでの保存はしない設計にしています。</p>
+  </div>
+</section>
+
+
+<!-- 07 -->
+<section class="sec" id="s7">
+  <div class="sec-head"><span class="sec-num">07</span><h2>費用試算</h2></div>
+  <p class="lede">想定 約100件／月（商談ベース）。1件あたり3フォーマットを生成する前提です。</p>
+
+  <div class="scroller">
+    <table>
+      <thead><tr><th>項目</th><th>内容</th><th class="m">月額（概算）</th></tr></thead>
+      <tbody>
+        <tr><td class="k">経路A（対話）</td><td>claude.ai のプラン内で使えます。<strong>従量課金は発生しません</strong></td><td class="m"><strong>0円</strong></td></tr>
+        <tr><td class="k">経路B｜AI利用料</td><td>Claude（Sonnet 5）で3フォーマット×100件</td><td class="m">約 2,600円</td></tr>
+        <tr><td class="k">経路B｜企業データ取得料</td><td><strong>CSV運用なら0円</strong>（既存データを流用）</td><td class="m">0円</td></tr>
+        <tr><td class="k">経路B｜インフラ</td><td>サーバー不要</td><td class="m">0円</td></tr>
+        <tr><td class="k">合計</td><td>経路Aのみなら0円／経路Bまで進めた場合</td><td class="m"><strong>0〜約2,600円／月</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    前版で <strong>1.3〜4.3万円／月</strong> とお出ししていたレンジの幅は、<strong>企業データの取得単価</strong>によるものでした。
+    CSV運用にすればこの変動要因が消え、<strong>月2,600円程度</strong>で収まります。
+  </p>
+  <p style="font-size:13.5px;color:var(--muted)">
+    ※ 将来APIに切り替える場合、データ取得料が別途かかります（帝国データバンクは個別見積り。一般のデータ提供は基本料金＋1件10〜400円の体系）。
+  </p>
+</section>
+
+
+<!-- 08 -->
+<section class="sec" id="s8">
+  <div class="sec-head"><span class="sec-num">08</span><h2>未確定の事項</h2></div>
+  <p class="lede">下記をいただければ、要件を確定して実装に入れます。</p>
+
+  <div class="scroller">
+    <table>
+      <thead><tr><th>#</th><th>いただきたいもの</th><th>これが決まると</th><th>優先</th></tr></thead>
+      <tbody>
+        <tr><td class="m">1</td><td class="k">3フォーマットの実物</td><td><strong>生成方式（A案／B案）が決まります。</strong>体裁の固定度を見て判断します</td><td><span class="pill req">最優先</span></td></tr>
+        <tr><td class="m">2</td><td class="k">企業データのCSVサンプル 1本</td><td>第4章の項目定義を、実データに合わせて確定できます</td><td><span class="pill req">最優先</span></td></tr>
+        <tr><td class="m">3</td><td class="k">claude.ai のご利用プラン</td><td><strong>経路Aが使えるかが決まります</strong>（Pro / Max / Team / Enterprise が必要）</td><td><span class="pill req">最優先</span></td></tr>
+        <tr><td class="m">4</td><td class="k">管理画面の利用者範囲</td><td>権限設計が決まります（代表のみ／営業メンバー全員）</td><td><span class="pill rec">推奨</span></td></tr>
+        <tr><td class="m">5</td><td class="k">生成物の保存先フォルダ構成</td><td>クライアント別フォルダの作り方が決まります</td><td><span class="pill rec">推奨</span></td></tr>
+        <tr><td class="m">6</td><td class="k">生成物の修正フロー</td><td>そのまま使うのか、必ず人が加筆するのかで、プレビューの作りが変わります</td><td><span class="pill opt">任意</span></td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="note crit">
-    <span class="lbl">実装前にいただきたいもの</span>
-    <p>コードは<strong>3フォーマットの実物を見ずに書いています</strong>。
-    テンプレート化する際、体裁の変動が大きい場合は設計を見直す必要があります。
-    <strong>直近の商談で実際にお使いになった3点</strong>をいただければ、テンプレート化までこちらで行います。</p>
+    <span class="lbl">1と2があれば着手できます</span>
+    <p>とくに<strong>3フォーマットの実物</strong>は、これ1つで生成方式・項目定義・出力設計のすべてが確定します。
+    完成品でなくても、直近の商談で実際にお使いになったものであれば十分です。</p>
   </div>
 
-  <p style="font-size:13.5px;color:var(--muted)">
-    ご不明点は、弊社の担当窓口までお寄せください。
+  <h3>従来の宿題との関係</h3>
+  <p>
+    前版でお願いしていた<strong>「帝国データバンクの契約状況」「タクトの正式サービス名」「証券データの提供元」</strong>は、
+    <strong>いったん保留で構いません</strong>。CSV運用で先に動かし、必要になった時点で確認すれば足ります。
+    <strong>経路Aから始める場合は、アプリの実装そのものが後回しにできる</strong>ため、
+    3フォーマットの実物とプランの確認だけで着手できます。
   </p>
 </section>
 
 <footer class="end">
   <span>株式会社デジライズ</span>
-  <span>営業支援コンソール 設計と実装 v1.0 ／ 2026-09-08</span>
+  <span>企業プロファイル作成 要件定義 v1.0 ／ 2026-09-08</span>
 </footer>
 
 </div>
-
-<script>
-(function(){
-  document.querySelectorAll('button[data-copy-src]').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var el = document.getElementById(btn.getAttribute('data-copy-src'));
-      var text = el ? el.textContent : '';
-      var ok = function(){
-        var old = btn.textContent;
-        btn.textContent = 'コピー済';
-        btn.classList.add('copied');
-        setTimeout(function(){ btn.textContent = old; btn.classList.remove('copied'); }, 1400);
-      };
-      function fallback(){
-        var ta = document.createElement('textarea');
-        ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
-        document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); ok(); } catch(e){}
-        document.body.removeChild(ta);
-      }
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(ok, fallback);
-      } else { fallback(); }
-    });
-  });
-})();
-</script>
