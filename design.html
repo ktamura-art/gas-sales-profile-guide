@@ -706,7 +706,7 @@ function csvHeaderIndex_(headerRow) {
  * 【すぐ動きます】台帳に見本を3社入れて、読み取りと欠け判定を確認する
  * 実行後、ログに「企業名／不足項目」の一覧が出ます。
  */
-function testCompanyStore_() {
+function testCompanyStore() {
   const csv =
     &#x27;company_name,industry,employees,revenue,business_desc,address,note\n&#x27; +
     &#x27;株式会社サンプル製作所,金属製品製造,120,2400000000,精密部品の受託加工,愛知県名古屋市,3期連続増収\n&#x27; +
@@ -868,7 +868,7 @@ function parseJson_(text) {
  * 【テンプレートIDの設定後に実行】差し込み箇所が正しく読めるかを確認する
  * ログに、3フォーマットそれぞれの {{ }} の一覧が出ます。
  */
-function testPlaceholders_() {
+function testPlaceholders() {
   Object.keys(営業支援設定.TEMPLATES).forEach(function (k) {
     const tpl = 営業支援設定.TEMPLATES[k];
     try {
@@ -884,9 +884,9 @@ function testPlaceholders_() {
  * 【APIキーの設定後に実行】1フォーマットだけ生成して結果をログに出す
  * ドキュメントは作らないため、生成内容だけを安全に確認できます。
  */
-function testGenerateOnly_() {
+function testGenerateOnly() {
   const company = readCompanies_()[0];
-  if (!company) { Logger.log(&#x27;台帳に企業がありません。先に testCompanyStore_() を実行してください&#x27;); return; }
+  if (!company) { Logger.log(&#x27;台帳に企業がありません。先に testCompanyStore() を実行してください&#x27;); return; }
 
   const values = generateValues_(company, &#x27;sim&#x27;, &#x27;&#x27;);
   Logger.log(&#x27;対象企業：%s&#x27;, company[&#x27;企業名&#x27;]);
@@ -1015,9 +1015,9 @@ function readHistory_(limit) {
  * 【テンプレートと保存先の設定後に実行】ドキュメントを1本だけ作ってみる
  * AIは使わず、固定のダミー値で差し込みます。テンプレートと保存先の設定確認用です。
  */
-function testRenderOnly_() {
+function testRenderOnly() {
   const company = readCompanies_()[0];
-  if (!company) { Logger.log(&#x27;台帳に企業がありません。先に testCompanyStore_() を実行してください&#x27;); return; }
+  if (!company) { Logger.log(&#x27;台帳に企業がありません。先に testCompanyStore() を実行してください&#x27;); return; }
 
   const keys = extractPlaceholders_(営業支援設定.TEMPLATES.sim.docId);
   const values = {};
@@ -1173,9 +1173,9 @@ function api_listHistory() {
  * 【設定がひととおり済んだら実行】画面を通さずに、生成から保存までを1回通す
  * ★実際にドキュメントが作られます。確認後は削除してください。
  */
-function testEndToEnd_() {
+function testEndToEnd() {
   const list = api_listCompanies(&#x27;&#x27;);
-  if (!list.length) { Logger.log(&#x27;台帳に企業がありません。先に testCompanyStore_() を実行してください&#x27;); return; }
+  if (!list.length) { Logger.log(&#x27;台帳に企業がありません。先に testCompanyStore() を実行してください&#x27;); return; }
 
   const name = list[0].name;
   Logger.log(&#x27;対象：%s&#x27;, name);
@@ -1507,11 +1507,11 @@ loadList();
     <table>
       <thead><tr><th>#</th><th>実行する関数</th><th>確認できること</th><th>事前に必要なもの</th></tr></thead>
       <tbody>
-        <tr><td class="m">1</td><td class="m">testCompanyStore_()</td><td>CSVの取り込みと、必須項目の欠け判定。見本3社が台帳に入ります</td><td>シートID</td></tr>
-        <tr><td class="m">2</td><td class="m">testPlaceholders_()</td><td>テンプレートの <code class="inl">{{ }}</code> が正しく読めるか</td><td>テンプレートID</td></tr>
-        <tr><td class="m">3</td><td class="m">testGenerateOnly_()</td><td>AIの生成内容。<strong>ドキュメントは作りません</strong></td><td>APIキー</td></tr>
-        <tr><td class="m">4</td><td class="m">testRenderOnly_()</td><td>テンプレートの複製と保存先。<strong>AIは使いません</strong></td><td>保存先フォルダID</td></tr>
-        <tr><td class="m">5</td><td class="m">testEndToEnd_()</td><td>生成から保存までを1本通す</td><td>1〜4が通ること</td></tr>
+        <tr><td class="m">1</td><td class="m">testCompanyStore()</td><td>CSVの取り込みと、必須項目の欠け判定。見本3社が台帳に入ります</td><td>シートID</td></tr>
+        <tr><td class="m">2</td><td class="m">testPlaceholders()</td><td>テンプレートの <code class="inl">{{ }}</code> が正しく読めるか</td><td>テンプレートID</td></tr>
+        <tr><td class="m">3</td><td class="m">testGenerateOnly()</td><td>AIの生成内容。<strong>ドキュメントは作りません</strong></td><td>APIキー</td></tr>
+        <tr><td class="m">4</td><td class="m">testRenderOnly()</td><td>テンプレートの複製と保存先。<strong>AIは使いません</strong></td><td>保存先フォルダID</td></tr>
+        <tr><td class="m">5</td><td class="m">testEndToEnd()</td><td>生成から保存までを1本通す</td><td>1〜4が通ること</td></tr>
         <tr><td class="m">6</td><td class="k">画面を開く</td><td>デプロイしたURLを開き、3タブを操作</td><td>デプロイ</td></tr>
       </tbody>
     </table>
